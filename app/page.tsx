@@ -2221,7 +2221,7 @@ export default function Home() {
             animation: none !important;
             transition: none !important;
             transform: none !important;
-          }
+          } 
         }
       `}</style>
     </>
