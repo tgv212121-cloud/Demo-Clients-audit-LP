@@ -1,0 +1,218 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6ead6;
+  --foreground: #0f0f0f;
+  --accent: #d4b173;
+  --accent-dark: #b8955f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(212, 177, 115, 0.24), transparent 30%),
+    linear-gradient(180deg, #fbf5eb 0%, #f6ead6 100%);
+  color: var(--foreground);
+}
+
+img {
+  max-width: 100%;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000000;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(212, 177, 115, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.input-primary {
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 1px solid #e2d6c2;
+  width: 100%;
+  outline: none;
+  background: rgba(255, 255, 255, 0.82);
+  color: #0f0f0f;
+  font-size: 16px;
+}
+
+.input-primary:focus {
+  border-color: #d4b173;
+  box-shadow: 0 0 0 4px rgba(212, 177, 115, 0.14);
+}
+
+.loading-bar {
+  background: linear-gradient(90deg, #c79d63 0%, #d4b173 50%, #e5c694 100%);
+  transition: width 0.2s ease;
+  box-shadow: 0 8px 20px rgba(212, 177, 115, 0.35);
+}
+
+.premium-card {
+  border: 1px solid rgba(15, 15, 15, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.card-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(15, 15, 15, 0.48);
+}
+
+.annotation-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 999px;
+  background: #0f0f0f;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.annotation-dot:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.annotation-dot-active {
+  background: #d4b173;
+  color: #000000;
+}
+
+.annotation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(15, 15, 15, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  color: rgba(15, 15, 15, 0.74);
+}
+
+.annotation-chip:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.annotation-chip-active {
+  background: #0f0f0f;
+  color: #ffffff;
+}
+
+.annotation-chip-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(15, 15, 15, 0.08);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.annotation-chip-active .annotation-chip-number {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.quick-index {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #d4b173;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.severity-badge {
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.severity-high {
+  background: rgba(195, 55, 55, 0.12);
+  color: #9f2020;
+}
+
+.severity-medium {
+  background: rgba(185, 125, 36, 0.12);
+  color: #8a5b16;
+}
+
+.severity-low {
+  background: rgba(27, 125, 77, 0.12);
+  color: #13613b;
+}
+
+.clickway-card {
+  border-radius: 30px;
+  padding: 28px;
+  background: linear-gradient(135deg, #131313 0%, #232323 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+}
+
+.clickway-link {
+  display: inline-flex;
+  margin-top: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #d4b173;
+  color: #000000;
+  text-decoration: none;
+  padding: 14px 20px;
+  font-weight: 700;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.clickway-link:hover {
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
