@@ -4,14 +4,40 @@ import chromium from "@sparticuz/chromium"
 import puppeteer, { type Page } from "puppeteer-core"
 import { PNG } from "pngjs"
 
+export type PageBlockType =
+  | "headline"
+  | "subheadline"
+  | "body"
+  | "cta"
+  | "input"
+  | "form"
+  | "pricing"
+  | "testimonial"
+  | "faq"
+  | "proof"
+  | "navigation"
+  | "hero"
+  | "media"
+  | "card"
+  | "section"
+  | "content"
+
 export type PageBlock = {
   id: string
-  type: string
+  type: PageBlockType
   text: string
   x: number
   y: number
   width: number
   height: number
+  selectorHint?: string
+  domPath?: string
+  targetLabel?: string
+  tagName?: string
+  role?: string
+  href?: string
+  ariaLabel?: string
+  score?: number
 }
 
 export type PageSnapshot = {
