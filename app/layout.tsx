@@ -8,7 +8,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Audit landing page",
+  title: "DigitalTimes",
   description: "Analyse CRO de landing page",
 }
 

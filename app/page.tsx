@@ -724,13 +724,13 @@ export default function Home() {
               className="reveal flex items-center justify-between gap-4"
             >
               <a
-                href="https://clickway.fr"
+                href="https://digitaltimes.fr/"
                 target="_blank"
                 rel="noreferrer"
                 className="group inline-flex items-center rounded-full border border-white/12 bg-white/8 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-white/88 transition duration-300 hover:-translate-y-0.5 hover:bg-white/12 hover:shadow-[0_10px_30px_rgba(255,255,255,0.08)]"
               >
                 <span className="relative">
-                  Clickway
+                  DigitalTimes
                   <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-white/70 transition duration-300 group-hover:scale-x-100" />
                 </span>
               </a>
@@ -1490,14 +1490,14 @@ export default function Home() {
                     </p>
 
                     <p className="text-base leading-8 text-white/78">
-                      C'est exactement le rôle de Clickway.
+                      C'est exactement le rôle de DigitalTimes.
                     </p>
                   </div>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-2">
                     <div className="dark-tile rounded-[24px] border border-white/10 bg-white/5 p-5">
                       <p className="text-sm font-semibold text-white">
-                        Ce que Clickway travaille
+                        Ce que DigitalTimes travaille
                       </p>
 
                       <div className="mt-4 space-y-3 text-sm leading-6 text-white/72">
@@ -1586,7 +1586,7 @@ export default function Home() {
 
                   <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                     <a
-                      href="https://clickway.fr"
+                      href="https://digitaltimes.fr/"
                       target="_blank"
                       rel="noreferrer"
                       className="cta-dark inline-flex items-center justify-center rounded-2xl px-6 py-4 text-base font-semibold text-white transition"
@@ -1595,7 +1595,7 @@ export default function Home() {
                     </a>
 
                     <a
-                      href="https://clickway.fr"
+                      href="https://digitaltimes.fr/"
                       target="_blank"
                       rel="noreferrer"
                       className="cta-light inline-flex items-center justify-center rounded-2xl border border-black/12 bg-[#f3ede4] px-6 py-4 text-base font-semibold text-black transition"
@@ -2226,4 +2226,4 @@ export default function Home() {
       `}</style>
     </>
   )
-}    
+}
