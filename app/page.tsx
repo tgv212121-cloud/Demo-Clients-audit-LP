@@ -43,13 +43,6 @@ type Finding = {
   whyNow: string
 }
 
-type MissingRevenueRange = {
-  low: number
-  high: number
-  currency: string
-  period: string
-}
-
 type AnalyseResult = {
   success?: boolean
   message?: string
@@ -64,8 +57,6 @@ type AnalyseResult = {
   estimatedUplift?: string
   deliveryTime?: string
   priorities?: Priorities
-  missingRevenue?: string
-  missingRevenueRange?: MissingRevenueRange
   findings?: Finding[]
 }
 
@@ -104,7 +95,7 @@ const loadingSteps = [
   },
   {
     title: "Finalisation du rapport",
-    text: "Nous préparons l'affichage final avec le potentiel, le manque à gagner et les priorités.",
+    text: "Nous préparons l'affichage final avec le potentiel et les priorités.",
   },
 ]
 
@@ -364,15 +355,6 @@ function getAnnotationCardPosition(annotation: DisplayAnnotation) {
   }
 }
 
-function formatMoneyRange(range?: MissingRevenueRange) {
-  if (!range) {
-    return null
-  }
-
-  const formatter = new Intl.NumberFormat("fr-FR")
-  return `${formatter.format(range.low)} à ${formatter.format(range.high)} ${range.currency} / ${range.period}`
-}
-
 function getPriorityTone(priorities?: Priorities) {
   if (!priorities) {
     return "La page présente plusieurs frictions visibles sur le message, la confiance et l'action."
@@ -468,7 +450,6 @@ export default function Home() {
     }
 
     if (!activeAnnotationId) {
-      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
       return
     }
 
@@ -477,7 +458,7 @@ export default function Home() {
     )
 
     if (!exists) {
-      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
+      setActiveAnnotationId(null)
     }
   }, [displayAnnotations, activeAnnotationId])
 
@@ -748,7 +729,6 @@ export default function Home() {
 
   const currentLoadingStep = getLoadingStep(progress)
   const shouldShowResult = Boolean(result && !result.error && !loading && isResultVisualReady)
-  const missingRevenueFormatted = formatMoneyRange(result?.missingRevenueRange)
 
   return (
     <>
@@ -823,7 +803,7 @@ export default function Home() {
                   </h1>
 
                   <p className="mt-6 max-w-3xl text-base leading-8 text-white/68 md:text-xl">
-                    Colle ton URL. En quelques secondes, tu vois les frictions visibles, le potentiel de gain et le manque à gagner que ta page laisse passer.
+                    Colle ton URL. En quelques secondes, tu vois les frictions visibles, le potentiel de gain et la direction stratégique à suivre.
                   </p>
                 </div>
 
@@ -901,7 +881,7 @@ export default function Home() {
                         En une analyse
                       </p>
                       <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                        Tu vois ce qui affaiblit la conversion avant que ça te coûte plus de trafic et plus d'argent.
+                        Tu vois ce qui affaiblit la conversion avant que ça te coûte plus de trafic et plus d'opportunités.
                       </h2>
 
                       <div className="mt-6 grid gap-3">
@@ -978,7 +958,7 @@ export default function Home() {
                       <p className="text-lg font-semibold">Tu vois le manque</p>
                     </div>
                     <p className="mt-4 text-sm leading-7 text-black/66">
-                      Frictions visibles, impact business, potentiel, manque à gagner et angle de correction.
+                      Frictions visibles, impact business, potentiel et angle de correction.
                     </p>
                   </div>
                 </div>
@@ -1059,56 +1039,47 @@ export default function Home() {
           )}
 
           {shouldShowResult && (
-  <section ref={resultSectionRef} className="mt-6">
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.72fr)_390px]">
-      <div className="min-w-0">
+            <section ref={resultSectionRef} className="mt-6">
+              <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.72fr)_390px]">
+                <div className="min-w-0">
+                  <div
+                    data-reveal
+                    data-reveal-result
+                    className="reveal mb-6 overflow-hidden rounded-[30px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] md:p-6"
+                  >
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="max-w-3xl">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
+                          Version agence
+                        </p>
 
-        <div
-          data-reveal
-          data-reveal-result
-          className="reveal mb-6 overflow-hidden rounded-[30px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] md:p-6"
-        >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
-                Version agence
-              </p>
+                        <h3 className="mt-2 text-2xl font-semibold leading-tight text-black md:text-3xl">
+                          Tu aimerais proposer ce mini outil à tes prospects sous la marque de ton agence ?
+                        </h3>
 
-              <h3 className="mt-2 text-2xl font-semibold leading-tight text-black md:text-3xl">
-                Tu aimerais proposer ce mini outil à tes prospects sous la marque de ton agence ?
-              </h3>
+                        <p className="mt-3 text-sm leading-7 text-black/68 md:text-base">
+                          DigitalTimes conçoit ce type de mini outil en marque blanche pour aider les agences à générer plus de leads et convertir plus vite.
+                        </p>
+                      </div>
 
-              <p className="mt-3 text-sm leading-7 text-black/68 md:text-base">
-                DigitalTimes conçoit ce type de mini outil en marque blanche pour aider les agences à générer plus de leads et convertir plus vite.
-              </p>
-            </div>
+                      <div className="flex shrink-0">
+                        <a
+                          href="https://digitaltimes.fr/"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center rounded-2xl bg-black px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black/90"
+                        >
+                          Découvrir la version personnalisée pour mon agence
+                        </a>
+                      </div>
+                    </div>
+                  </div>
 
-            <div className="flex shrink-0">
-              <a
-                href="https://digitaltimes.fr/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl bg-black px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black/90"
-              >
-                Découvrir la version personnalisée pour mon agence
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div
-          data-reveal
-          data-reveal-result
-          className="reveal mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
-        >
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-              Capture analysée
-            </p>
-            <h2 className="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-5xl">
-              Voilà où ta landing page sous-performe.
-            </h2>
-          </div>
+                  <div
+                    data-reveal
+                    data-reveal-result
+                    className="reveal mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
+                  >
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
                         Capture analysée
@@ -1131,7 +1102,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <div
                       data-reveal
                       data-reveal-result
@@ -1161,22 +1132,6 @@ export default function Home() {
                       </p>
                       <p className="mt-3 text-sm leading-6 text-black/62">
                         Gain de conversion plausible si les bons leviers sont retravaillés.
-                      </p>
-                    </div>
-
-                    <div
-                      data-reveal
-                      data-reveal-result
-                      className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
-                    >
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
-                        Manque à gagner
-                      </p>
-                      <p className="mt-3 text-2xl font-semibold leading-tight text-black">
-                        {missingRevenueFormatted || result?.missingRevenue || "Non estimé"}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-black/62">
-                        Lecture prudente de la valeur qui n'est pas captée aujourd'hui.
                       </p>
                     </div>
 
@@ -1797,7 +1752,7 @@ export default function Home() {
                         Ce que ça coûte déjà
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Le manque à gagner lié à une page qui sous-performe sans forcément paraître mauvaise.
+                        Le manque se mesure en performance ratée, pas en apparence.
                       </p>
                     </div>
 
@@ -1934,7 +1889,7 @@ export default function Home() {
                       </p>
 
                       <h3 className="mt-3 text-2xl font-semibold leading-tight">
-                        Nous préparons un pré-audit qui montre ce qui affaiblit la page, ce que ça coûte et pourquoi la suite mérite un vrai travail de conversion.
+                        Nous préparons un pré-audit qui montre ce qui affaiblit la page, le potentiel visible et pourquoi la suite mérite un vrai travail de conversion.
                       </h3>
 
                       <div className="mt-6 grid gap-3">
@@ -1966,7 +1921,7 @@ export default function Home() {
                         Résultat attendu
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/62">
-                        À la fin, tu obtiens une capture annotée, une lecture claire des pertes, un potentiel de gain et une vraie tension commerciale pour passer à l'étape suivante.
+                        À la fin, tu obtiens une capture annotée, une lecture claire des pertes et une vraie tension commerciale pour passer à l'étape suivante.
                       </p>
                     </div>
                   </div>
