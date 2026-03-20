@@ -60,6 +60,7 @@ const WAIT_AFTER_NAV_MS = 450
 const WAIT_BEFORE_FIRST_SLICE_MS = 700
 const WAIT_BEFORE_RETRY_FIRST_SLICE_MS = 1100
 const JPEG_QUALITY = 72
+const MAX_BLOCKS = 90
 
 async function launchBrowser() {
   const localBinPath = path.join(
@@ -94,6 +95,25 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function shortText(value: string, max = 180) {
+  const clean = normalizeText(value)
+  if (clean.length <= max) {
+    return clean
+  }
+  return `${clean.slice(0, max)}...`
+}
+
+function normalizeForCompare(value: string) {
+  return normalizeText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
 async function waitForNetworkCalm(page: Page) {
   try {
     await page.waitForNetworkIdle({
@@ -115,7 +135,7 @@ async function waitForPageAssets(page: Page) {
       }
     } catch {}
 
-    const images = Array.from(document.images || []).slice(0, 120)
+    const images = Array.from(document.images || []).slice(0, 140)
 
     await Promise.all(
       images.map((img) => {
@@ -235,7 +255,7 @@ async function triggerLazyLoad(page: Page) {
       let current = 0
       let loops = 0
 
-      while (current < maxScroll && loops < 40) {
+      while (current < maxScroll && loops < 45) {
         current = Math.min(current + step, maxScroll)
         window.scrollTo(0, current)
         await wait(waitMs)
@@ -302,6 +322,8 @@ async function preparePageForStableScreenshot(page: Page) {
       "[aria-label*='chat']",
       "[aria-label*='support']",
       "[aria-label*='messenger']",
+      "[data-testid*='cookie']",
+      "[data-testid*='consent']",
     ]
 
     document.querySelectorAll(hideSelectors.join(",")).forEach((node) => {
@@ -413,10 +435,184 @@ async function getPageMetrics(page: Page) {
   }, MAX_CAPTURE_HEIGHT)
 }
 
+function getTagWeight(tagName: string) {
+  if (tagName === "h1") return 100
+  if (tagName === "h2") return 94
+  if (tagName === "h3") return 88
+  if (tagName === "button") return 92
+  if (tagName === "input") return 90
+  if (tagName === "textarea") return 88
+  if (tagName === "form") return 90
+  if (tagName === "section") return 66
+  if (tagName === "article") return 64
+  if (tagName === "header") return 70
+  if (tagName === "a") return 72
+  return 50
+}
+
+function getTypeWeight(type: PageBlockType) {
+  if (type === "headline") return 100
+  if (type === "subheadline") return 94
+  if (type === "cta") return 96
+  if (type === "form") return 92
+  if (type === "input") return 88
+  if (type === "pricing") return 85
+  if (type === "testimonial") return 82
+  if (type === "proof") return 80
+  if (type === "hero") return 86
+  if (type === "faq") return 72
+  if (type === "section") return 56
+  if (type === "card") return 62
+  if (type === "body") return 55
+  return 48
+}
+
+function inferBlockType(params: {
+  tagName: string
+  role: string
+  text: string
+  className: string
+  id: string
+  href: string
+  ariaLabel: string
+  rectWidth: number
+  rectHeight: number
+}) {
+  const {
+    tagName,
+    role,
+    text,
+    className,
+    id,
+    href,
+    ariaLabel,
+    rectWidth,
+    rectHeight,
+  } = params
+
+  const haystack = normalizeForCompare(
+    `${text} ${className} ${id} ${ariaLabel} ${href}`
+  )
+
+  if (tagName === "h1") return "headline" as const
+  if (tagName === "h2" || tagName === "h3") return "subheadline" as const
+  if (tagName === "form") return "form" as const
+  if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+    return "input" as const
+  }
+
+  if (
+    tagName === "button" ||
+    role === "button" ||
+    (tagName === "a" &&
+      (haystack.includes("demarrer") ||
+        haystack.includes("commencer") ||
+        haystack.includes("reserver") ||
+        haystack.includes("essayer") ||
+        haystack.includes("audit") ||
+        haystack.includes("devis") ||
+        haystack.includes("contact") ||
+        haystack.includes("book") ||
+        haystack.includes("start") ||
+        haystack.includes("get started") ||
+        haystack.includes("try")))
+  ) {
+    return "cta" as const
+  }
+
+  if (
+    haystack.includes("testimonial") ||
+    haystack.includes("temoign") ||
+    haystack.includes("avis client") ||
+    haystack.includes("ce qu'ils disent")
+  ) {
+    return "testimonial" as const
+  }
+
+  if (
+    haystack.includes("pricing") ||
+    haystack.includes("tarif") ||
+    haystack.includes("offre") ||
+    haystack.includes("plan")
+  ) {
+    return "pricing" as const
+  }
+
+  if (
+    haystack.includes("faq") ||
+    haystack.includes("question") ||
+    haystack.includes("frequently asked")
+  ) {
+    return "faq" as const
+  }
+
+  if (
+    haystack.includes("proof") ||
+    haystack.includes("trusted") ||
+    haystack.includes("vu sur") ||
+    haystack.includes("ils nous font confiance") ||
+    haystack.includes("client") ||
+    haystack.includes("marque") ||
+    haystack.includes("logo")
+  ) {
+    return "proof" as const
+  }
+
+  if (
+    haystack.includes("hero") ||
+    (rectWidth > 55 && rectHeight > 10 && (tagName === "section" || tagName === "header"))
+  ) {
+    return "hero" as const
+  }
+
+  if (tagName === "section" || tagName === "article" || tagName === "header") {
+    return "section" as const
+  }
+
+  if (tagName === "a") {
+    return "navigation" as const
+  }
+
+  if (rectWidth > 25 && rectHeight > 6) {
+    return "card" as const
+  }
+
+  if (text.length > 80) {
+    return "body" as const
+  }
+
+  return "content" as const
+}
+
 async function collectBlocks(page: Page): Promise<PageBlock[]> {
-  const pageData = await page.evaluate(() => {
+  const pageData = await page.evaluate((maxBlocks) => {
     function stripHtmlText(value: string) {
       return value.replace(/\s+/g, " ").trim()
+    }
+
+    function shortDomPath(element: Element) {
+      const parts: string[] = []
+      let current: Element | null = element
+      let depth = 0
+
+      while (current && depth < 5) {
+        const tag = current.tagName.toLowerCase()
+        const id = current.id ? `#${current.id}` : ""
+        let cls = ""
+
+        if (current instanceof HTMLElement) {
+          const classNames = Array.from(current.classList).slice(0, 2)
+          if (classNames.length) {
+            cls = `.${classNames.join(".")}`
+          }
+        }
+
+        parts.unshift(`${tag}${id}${cls}`)
+        current = current.parentElement
+        depth += 1
+      }
+
+      return parts.join(" > ")
     }
 
     const fullHeight = Math.max(
@@ -430,20 +626,30 @@ async function collectBlocks(page: Page): Promise<PageBlock[]> {
       "h1",
       "h2",
       "h3",
+      "h4",
+      "p",
       "button",
       "a",
+      "form",
+      "input",
+      "textarea",
+      "select",
       "[role='button']",
+      "[role='heading']",
       "section",
       "article",
       "header",
-      "main > div",
       "main section",
+      "main article",
       "[class*='hero']",
       "[class*='cta']",
       "[class*='card']",
       "[class*='feature']",
       "[class*='testimonial']",
       "[class*='pricing']",
+      "[class*='faq']",
+      "[class*='proof']",
+      "[data-testid]",
     ].join(",")
 
     const elements = Array.from(document.querySelectorAll(selector))
@@ -453,22 +659,40 @@ async function collectBlocks(page: Page): Promise<PageBlock[]> {
       .map((element, index) => {
         const rect = element.getBoundingClientRect()
         const style = window.getComputedStyle(element)
-        const text = stripHtmlText(element.textContent || "")
+        const text = stripHtmlText(
+          (element instanceof HTMLInputElement && element.placeholder) ||
+            element.getAttribute("aria-label") ||
+            element.textContent ||
+            ""
+        )
 
         if (style.display === "none" || style.visibility === "hidden") {
           return null
         }
 
-        if (rect.width < 120 || rect.height < 28) {
+        if (rect.width < 90 || rect.height < 20) {
+          return null
+        }
+
+        if (rect.bottom < -40 || rect.top > window.innerHeight + 25000) {
           return null
         }
 
         const absTop = rect.top + window.scrollY
         const area = rect.width * rect.height
 
-        if (area < 8000) {
+        if (area < 5000 && text.length < 18) {
           return null
         }
+
+        const tagName = element.tagName.toLowerCase()
+        const role = element.getAttribute("role") || ""
+        const href =
+          element instanceof HTMLAnchorElement ? element.getAttribute("href") || "" : ""
+        const ariaLabel = element.getAttribute("aria-label") || ""
+        const className =
+          element instanceof HTMLElement ? element.className || "" : ""
+        const id = element.id || ""
 
         const key = [
           Math.round(rect.left),
@@ -476,6 +700,7 @@ async function collectBlocks(page: Page): Promise<PageBlock[]> {
           Math.round(rect.width),
           Math.round(rect.height),
           text.slice(0, 80),
+          tagName,
         ].join("|")
 
         if (seen.has(key)) {
@@ -484,47 +709,110 @@ async function collectBlocks(page: Page): Promise<PageBlock[]> {
 
         seen.add(key)
 
-        const tag = element.tagName.toLowerCase()
-        let type = "content"
-
-        if (tag === "h1" || tag === "h2" || tag === "h3") {
-          type = "headline"
-        } else if (
-          tag === "button" ||
-          tag === "a" ||
-          element.getAttribute("role") === "button"
-        ) {
-          type = "cta"
-        } else if (
-          tag === "section" ||
-          tag === "article" ||
-          tag === "header"
-        ) {
-          type = "section"
-        }
-
         return {
           id: `block-${index + 1}`,
-          type,
+          tagName,
+          role,
+          href,
+          ariaLabel,
+          className: typeof className === "string" ? className : "",
+          rawId: id,
           text,
           x: Number(((rect.left / window.innerWidth) * 100).toFixed(2)),
           y: Number(((absTop / fullHeight) * 100).toFixed(2)),
           width: Number(((rect.width / window.innerWidth) * 100).toFixed(2)),
           height: Number(((rect.height / fullHeight) * 100).toFixed(2)),
+          selectorHint:
+            tagName +
+            (id ? `#${id}` : "") +
+            (typeof className === "string" && className.trim()
+              ? `.${className.trim().split(/\s+/).slice(0, 2).join(".")}`
+              : ""),
+          domPath: shortDomPath(element),
+          targetLabel:
+            ariaLabel ||
+            element.getAttribute("title") ||
+            text.slice(0, 160),
         }
       })
       .filter(Boolean)
-      .slice(0, 60)
+      .slice(0, maxBlocks)
 
     return { blocks }
-  })
+  }, MAX_BLOCKS)
 
-  return (pageData.blocks as PageBlock[])
-    .map((block) => ({
-      ...block,
-      text: normalizeText(block.text),
-    }))
+  const rawBlocks = pageData.blocks as Array<{
+    id: string
+    tagName: string
+    role: string
+    href: string
+    ariaLabel: string
+    className: string
+    rawId: string
+    text: string
+    x: number
+    y: number
+    width: number
+    height: number
+    selectorHint?: string
+    domPath?: string
+    targetLabel?: string
+  }>
+
+  const blocks: PageBlock[] = rawBlocks
+    .map((block) => {
+      const type = inferBlockType({
+        tagName: block.tagName,
+        role: block.role,
+        text: block.text,
+        className: block.className,
+        id: block.rawId,
+        href: block.href,
+        ariaLabel: block.ariaLabel,
+        rectWidth: block.width,
+        rectHeight: block.height,
+      })
+
+      const textWeight = Math.min(100, normalizeText(block.text).length)
+      const score = Math.round(
+        getTypeWeight(type) * 0.55 +
+          getTagWeight(block.tagName) * 0.25 +
+          textWeight * 0.2
+      )
+
+      return {
+        id: block.id,
+        type,
+        text: shortText(normalizeText(block.text), 220),
+        x: block.x,
+        y: block.y,
+        width: block.width,
+        height: block.height,
+        selectorHint: block.selectorHint,
+        domPath: block.domPath,
+        targetLabel: block.targetLabel ? shortText(block.targetLabel, 160) : undefined,
+        tagName: block.tagName,
+        role: block.role || undefined,
+        href: block.href || undefined,
+        ariaLabel: block.ariaLabel || undefined,
+        score,
+      }
+    })
     .filter((block) => block.y >= 0 && block.y <= 100)
+    .sort((a, b) => {
+      if ((b.score || 0) !== (a.score || 0)) {
+        return (b.score || 0) - (a.score || 0)
+      }
+
+      if (a.y !== b.y) {
+        return a.y - b.y
+      }
+
+      return a.x - b.x
+    })
+    .slice(0, MAX_BLOCKS)
+
+  return blocks
 }
 
 function buildScrollPositions(fullHeight: number, viewportHeight: number) {

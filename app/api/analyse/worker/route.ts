@@ -8,13 +8,26 @@ type AnnotationSeverity = "low" | "medium" | "high"
 type AuditFindingSeverity = "Faible" | "Moyenne" | "Élevée" | "Critique"
 type AuditFindingImpactLevel = "Faible" | "Moyen" | "Important" | "Très important"
 
+type AuditFindingCategory =
+  | "message"
+  | "structure"
+  | "trust"
+  | "cta"
+  | "ux"
+  | "offer"
+  | "friction"
+
 type AuditFinding = {
   title: string
+  category: AuditFindingCategory
   problem: string
-  impact: string
+  businessImpact: string
+  missedOpportunity: string
   severity: AuditFindingSeverity
   impactLevel: AuditFindingImpactLevel
-  improvementHint: string
+  conversionPotential: string
+  strategicDirection: string
+  whyNow: string
   targetId?: string
   targetText?: string
   targetType?: string
@@ -25,6 +38,14 @@ type AuditLLMResult = {
   score: number
   estimatedUplift: string
   summary: string
+  strategicSummary: string
+  missingRevenue: string
+  missingRevenueRange?: {
+    low: number
+    high: number
+    currency: string
+    period: string
+  }
   quickWins: string[]
   priorities: {
     clarity: number
@@ -45,45 +66,129 @@ type Annotation = {
   impactLabel?: string
 }
 
-const SYSTEM_PROMPT = `
-Tu es un expert senior en CRO, UX et copywriting.
-Tu travailles comme une agence qui facture des audits.
+type AuditReportResult = {
+  success: boolean
+  message: string
+  url: string
+  score: number
+  summary: string
+  strategicSummary: string
+  missingRevenue: string
+  missingRevenueRange?: {
+    low: number
+    high: number
+    currency: string
+    period: string
+  }
+  screenshotUrl: string
+  annotations: Annotation[]
+  quickWins: string[]
+  estimatedUplift: string
+  deliveryTime: string
+  priorities: {
+    clarity: number
+    trust: number
+    cta: number
+  }
+  findings: Array<{
+    title: string
+    category: AuditFindingCategory
+    problem: string
+    businessImpact: string
+    missedOpportunity: string
+    severity: AuditFindingSeverity
+    impactLevel: AuditFindingImpactLevel
+    conversionPotential: string
+    strategicDirection: string
+    whyNow: string
+  }>
+}
 
-Ton audit doit paraître humain, crédible et varié.
+const SYSTEM_PROMPT = `
+Tu es un consultant senior en CRO, UX, copywriting et stratégie de conversion.
+Tu travailles comme une agence premium qui vend des audits et des refontes de landing pages.
+
+Contexte business fondamental :
+ce rapport n'est pas un audit complet.
+C'est un pré-audit commercial.
+Il doit être crédible, humain, stratégique, frustrant de manière utile, et orienté vente.
+Il doit montrer les problèmes, montrer le potentiel, faire sentir le manque à gagner, mais sans donner le plan d'exécution détaillé.
 
 Objectif :
-- détecter les freins à la conversion
-- couvrir plusieurs dimensions de la page
-- éviter toute répétition de type de problème
+- détecter les freins visibles à la conversion
+- diversifier les critiques
+- quantifier le potentiel par point
+- donner une lecture business de la page
+- pousser vers une suite logique avec une agence
+- ne jamais donner une solution précise étape par étape
 
-Règle critique :
-tu dois impérativement couvrir plusieurs catégories différentes.
+Angle attendu :
+- parler comme un humain qui a déjà audité beaucoup de pages
+- ton clair, direct, crédible, consultant
+- les critiques doivent avoir une portée business, pas juste design
+- l'analyse doit faire sentir que la page n'est pas "cassée" mais sous-performante
 
+Règle de diversité obligatoire :
+tu dois couvrir plusieurs catégories.
+Tu dois produire 5 findings maximum, idéalement 5.
 Tu dois répartir les findings sur ces axes :
-- 1 problème de clarté du message ou de promesse
-- 1 problème de structure, hiérarchie ou ordre des sections
-- 1 problème de confiance, réassurance ou preuve sociale
-- 1 problème de conversion ou friction CTA
-- 1 problème complémentaire possible comme lisibilité, surcharge, design, densité, cohérence visuelle, focus ou compréhension
+- 1 problème de message, promesse ou offre perçue
+- 1 problème de structure, hiérarchie ou ordre de lecture
+- 1 problème de confiance, preuve ou réassurance
+- 1 problème de passage à l'action, friction ou conversion
+- 1 problème complémentaire lié à la lisibilité, densité, focus, cohérence visuelle ou compréhension
 
-Interdictions :
-- pas plus de 1 finding centré principalement sur le CTA, sauf si la page a un vrai problème majeur de CTA
+Interdictions absolues :
+- pas plus d'un finding principalement centré sur le CTA, sauf problème critique évident
 - pas de répétition du même problème reformulé
 - pas de critique générique
-- pas de doublon entre "CTA faible", "CTA peu visible", "CTA dupliqué", "CTA mal différencié" si cela décrit en fait le même problème
+- pas de recommandations opératoires détaillées
+- pas de texte du type "mettre un bouton rouge", "ajouter 3 témoignages", "déplacer exactement tel bloc sous tel bloc"
+- pas de checklist d'exécution
+- pas de jargon inutile
+- pas d'invention de texte ou de cible absente de la page
 
-Chaque critique doit être spécifique, concrète et utile comme dans un vrai audit d'agence.
+Tu peux donner une direction stratégique, jamais une recette détaillée.
+La direction stratégique doit faire comprendre l'axe de correction sans livrer le travail complet.
 
-Tu dois te comporter comme un humain qui analyse la page.
+Chaque finding doit comporter :
+- un problème concret observé
+- un impact business
+- un manque à gagner ou opportunité perdue
+- un potentiel de conversion plausible
+- une direction stratégique non détaillée
+- une raison business qui rend ce point prioritaire maintenant
+
+Le rapport global doit aussi contenir :
+- score global de la page
+- potentiel global de conversion
+- résumé standard
+- résumé stratégique plus vendeur
+- manque à gagner global
+- quick wins formulés à haut niveau, sans mode d'emploi
+- priorités chiffrées
+
+Important :
+le score doit refléter le niveau actuel de performance perçue de la landing page, pas sa qualité esthétique.
+estimatedUplift doit être crédible, pas extravagant.
+missingRevenue doit être exprimé comme un manque à gagner potentiel, même si c'est une fourchette prudente.
+Si le contexte ne permet pas de chiffrage fiable, garde une formulation prudente.
 
 Tu réponds uniquement en JSON valide compact sur une seule ligne.
-
 
 Format attendu :
 {
   "score": 0,
-  "estimatedUplift": "+18%",
+  "estimatedUplift": "+18% à +31%",
   "summary": "string",
+  "strategicSummary": "string",
+  "missingRevenue": "string",
+  "missingRevenueRange": {
+    "low": 0,
+    "high": 0,
+    "currency": "EUR",
+    "period": "mois"
+  },
   "quickWins": ["string", "string", "string", "string", "string"],
   "priorities": {
     "clarity": 0,
@@ -93,11 +198,15 @@ Format attendu :
   "findings": [
     {
       "title": "string",
+      "category": "message|structure|trust|cta|ux|offer|friction",
       "problem": "string",
-      "impact": "string",
+      "businessImpact": "string",
+      "missedOpportunity": "string",
       "severity": "Faible|Moyenne|Élevée|Critique",
       "impactLevel": "Faible|Moyen|Important|Très important",
-      "improvementHint": "string",
+      "conversionPotential": "+4% à +8%",
+      "strategicDirection": "string",
+      "whyNow": "string",
       "targetId": "target-1",
       "targetText": "texte précis ou quasi exact",
       "targetType": "headline|cta|form|pricing|testimonial|proof|faq|body|hero|section|input",
@@ -106,7 +215,13 @@ Format attendu :
   ]
 }
 
-Contraintes :
+Règles complémentaires :
+- quickWins doit rester haut niveau, pas trop actionnable
+- strategicDirection doit orienter sans expliquer comment exécuter
+- missingRevenue doit rester crédible et prudent
+- targetId doit pointer vers un id existant si tu es sûr
+- targetText doit reprendre le texte réel ou quasi exact
+- confidence doit refléter ton vrai niveau de certitude
 - pas de markdown
 - pas de texte avant ou après le JSON
 - JSON minifié sur une seule ligne
@@ -274,7 +389,7 @@ function buildUserPrompt(params: {
   const { url, pageTitle, metaDescription, textContent, blocks } = params
 
   return `
-Réalise un audit CRO stratégique de cette landing page.
+Réalise un pré-audit CRO commercial de cette landing page.
 
 URL : ${url}
 Titre de page : ${pageTitle || "Non disponible"}
@@ -284,24 +399,27 @@ Contenu texte extrait : ${textContent || "Non disponible"}
 Blocs visibles annotables disponibles :
 ${serializeBlocks(blocks)}
 
-Ta mission :
-- détecter les principaux freins à la conversion
+Mission :
+- détecter les principaux freins visibles à la conversion
 - hiérarchiser les problèmes
 - estimer le niveau global de performance
-- rester crédible comme un consultant humain
+- faire sentir l'écart entre le niveau actuel et le potentiel réel
 - associer chaque finding à une cible réelle et précise quand c'est possible
+- rester crédible comme un consultant humain
 - ne jamais inventer une cible ni un texte qui n'existe pas visiblement sur la page
 
-Rappel :
-- targetId doit pointer vers un id existant si tu es sûr de la cible
+Rappels critiques :
+- ce rapport doit vendre une suite logique, pas livrer l'intégralité du plan
+- strategicDirection doit orienter sans expliquer précisément comment faire
+- quickWins doit rester haut niveau
+- missingRevenue doit être prudent mais tangible
+- targetId doit pointer vers un id existant si tu es sûr
 - targetText doit reprendre le texte réel ou quasi exact de la cible
 - confidence doit refléter ton vrai niveau de certitude
 `.trim()
 }
 
-function normalizeSeverity(
-  severity: AuditFindingSeverity
-): AnnotationSeverity {
+function normalizeSeverity(severity: AuditFindingSeverity): AnnotationSeverity {
   if (severity === "Critique" || severity === "Élevée") {
     return "high"
   }
@@ -346,6 +464,22 @@ function parseImpactLevel(value: unknown): AuditFindingImpactLevel {
     return value
   }
   return "Faible"
+}
+
+function parseCategory(value: unknown): AuditFindingCategory {
+  if (
+    value === "message" ||
+    value === "structure" ||
+    value === "trust" ||
+    value === "cta" ||
+    value === "ux" ||
+    value === "offer" ||
+    value === "friction"
+  ) {
+    return value
+  }
+
+  return "ux"
 }
 
 function findBlockById(blocks: PageBlock[], blockId?: string) {
@@ -504,6 +638,18 @@ function getBlockAnchor(block: PageBlock) {
   }
 }
 
+function buildAnnotationText(finding: AuditFinding) {
+  return [
+    finding.problem,
+    finding.businessImpact,
+    finding.missedOpportunity,
+    `Direction : ${finding.strategicDirection}`,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .trim()
+}
+
 function buildFallbackAnnotations(findings: AuditFinding[]): Annotation[] {
   const fallbackZones = [
     { x: 18, y: 14 },
@@ -518,11 +664,11 @@ function buildFallbackAnnotations(findings: AuditFinding[]): Annotation[] {
     return {
       id: `a-fallback-${index + 1}`,
       title: finding.title,
-      text: `${finding.problem} ${finding.impact} ${finding.improvementHint}`.trim(),
+      text: buildAnnotationText(finding),
       x: fallback.x,
       y: fallback.y,
       severity: normalizeSeverity(finding.severity),
-      upliftPercent: mapImpactLevelToUplift(finding.impactLevel),
+      upliftPercent: finding.conversionPotential || mapImpactLevelToUplift(finding.impactLevel),
       impactLabel: finding.impactLevel.toLowerCase(),
     }
   })
@@ -570,104 +716,42 @@ function buildAnnotations(findings: AuditFinding[], blocks: PageBlock[]): Annota
   }
 
   const usedTypes = new Set<string>()
+  const usedCategories = new Set<AuditFindingCategory>()
 
+  const deduped = validated.filter((item, index, array) => {
+    const type = item.block.type
+    const category = item.finding.category
 
-const usedThemes = new Set<string>()
+    const duplicateByBlockOrTitle =
+      array.findIndex((other) => {
+        const sameBlock = other.block.id === item.block.id
+        const sameTitle =
+          normalizeForCompare(other.finding.title) ===
+          normalizeForCompare(item.finding.title)
 
-function getFindingTheme(title: string, text: string) {
-  const value = normalizeForCompare(`${title} ${text}`)
+        return sameBlock || sameTitle
+      }) !== index
 
-  if (
-    value.includes("cta") ||
-    value.includes("appel a l action") ||
-    value.includes("conversion")
-  ) {
-    return "cta"
-  }
+    if (duplicateByBlockOrTitle) {
+      return false
+    }
 
-  if (
-    value.includes("promesse") ||
-    value.includes("headline") ||
-    value.includes("message") ||
-    value.includes("offre") ||
-    value.includes("proposition de valeur") ||
-    value.includes("clarte")
-  ) {
-    return "message"
-  }
+    if (usedCategories.has(category) && category !== "ux") {
+      return false
+    }
 
-  if (
-    value.includes("preuve") ||
-    value.includes("sociale") ||
-    value.includes("temoign") ||
-    value.includes("confiance") ||
-    value.includes("reassurance") ||
-    value.includes("credibil")
-  ) {
-    return "trust"
-  }
+    if (
+      usedTypes.has(type) &&
+      (type === "cta" || type === "headline" || type === "section")
+    ) {
+      return false
+    }
 
-  if (
-    value.includes("structure") ||
-    value.includes("hierarchie") ||
-    value.includes("section") ||
-    value.includes("ordre") ||
-    value.includes("parcours")
-  ) {
-    return "structure"
-  }
+    usedTypes.add(type)
+    usedCategories.add(category)
 
-  if (
-    value.includes("lisibilite") ||
-    value.includes("design") ||
-    value.includes("surcharge") ||
-    value.includes("densite") ||
-    value.includes("focus") ||
-    value.includes("visuel")
-  ) {
-    return "ux"
-  }
-
-  return "other"
-}
-
-const deduped = validated.filter((item, index, array) => {
-  const type = item.block.type
-  const theme = getFindingTheme(
-  item.finding.title,
-  `${item.finding.problem} ${item.finding.impact} ${item.finding.improvementHint}`
-)
-
-  const duplicateByBlockOrTitle =
-    array.findIndex((other) => {
-      const sameBlock = other.block.id === item.block.id
-      const sameTitle =
-        normalizeForCompare(other.finding.title) ===
-        normalizeForCompare(item.finding.title)
-
-      return sameBlock || sameTitle
-    }) !== index
-
-  if (duplicateByBlockOrTitle) {
-    return false
-  }
-
-  if (theme !== "other" && usedThemes.has(theme)) {
-    return false
-  }
-
-  if (
-    usedTypes.has(type) &&
-    (type === "cta" || type === "headline" || type === "section")
-  ) {
-    return false
-  }
-
-  usedTypes.add(type)
-  usedThemes.add(theme)
-
-  return true
-})
+    return true
+  })
 
   const selected = deduped
     .sort((a, b) => {
@@ -706,13 +790,44 @@ const deduped = validated.filter((item, index, array) => {
   return selected.map((item, index) => ({
     id: `a${index + 1}`,
     title: item.finding.title,
-    text: `${item.finding.problem} ${item.finding.impact} ${item.finding.improvementHint}`.trim(),
+    text: buildAnnotationText(item.finding),
     x: item.anchorX,
     y: item.anchorY,
     severity: normalizeSeverity(item.finding.severity),
-    upliftPercent: mapImpactLevelToUplift(item.finding.impactLevel),
+    upliftPercent:
+      item.finding.conversionPotential || mapImpactLevelToUplift(item.finding.impactLevel),
     impactLabel: item.finding.impactLevel.toLowerCase(),
   }))
+}
+
+function sanitizeMissingRevenueRange(value: unknown) {
+  if (!value || typeof value !== "object") {
+    return undefined
+  }
+
+  const raw = value as {
+    low?: unknown
+    high?: unknown
+    currency?: unknown
+    period?: unknown
+  }
+
+  const low = Math.max(0, Number(raw.low) || 0)
+  const high = Math.max(low, Number(raw.high) || 0)
+  const currency =
+    typeof raw.currency === "string" && raw.currency.trim()
+      ? raw.currency.trim().slice(0, 8)
+      : "EUR"
+  const period =
+    typeof raw.period === "string" && raw.period.trim()
+      ? raw.period.trim().slice(0, 24)
+      : "mois"
+
+  if (!low && !high) {
+    return undefined
+  }
+
+  return { low, high, currency, period }
 }
 
 function sanitizeAuditResult(data: AuditLLMResult, blocks: PageBlock[]): AuditLLMResult {
@@ -723,11 +838,18 @@ function sanitizeAuditResult(data: AuditLLMResult, blocks: PageBlock[]): AuditLL
         .slice(0, 5)
         .map((finding): AuditFinding => ({
           title: String(finding.title || "Point à surveiller").trim(),
+          category: parseCategory(finding.category),
           problem: String(finding.problem || "").trim(),
-          impact: String(finding.impact || "").trim(),
+          businessImpact: String(finding.businessImpact || "").trim(),
+          missedOpportunity: String(finding.missedOpportunity || "").trim(),
           severity: parseSeverity(finding.severity),
           impactLevel: parseImpactLevel(finding.impactLevel),
-          improvementHint: String(finding.improvementHint || "").trim(),
+          conversionPotential:
+            typeof finding.conversionPotential === "string" && finding.conversionPotential.trim()
+              ? finding.conversionPotential.trim()
+              : mapImpactLevelToUplift(parseImpactLevel(finding.impactLevel)),
+          strategicDirection: String(finding.strategicDirection || "").trim(),
+          whyNow: String(finding.whyNow || "").trim(),
           targetId:
             typeof finding.targetId === "string" && validBlockIds.has(finding.targetId)
               ? finding.targetId
@@ -739,7 +861,10 @@ function sanitizeAuditResult(data: AuditLLMResult, blocks: PageBlock[]): AuditLL
         .filter(
           (finding) =>
             finding.title &&
-            (finding.problem || finding.impact || finding.improvementHint)
+            (finding.problem ||
+              finding.businessImpact ||
+              finding.missedOpportunity ||
+              finding.strategicDirection)
         )
     : []
 
@@ -748,11 +873,20 @@ function sanitizeAuditResult(data: AuditLLMResult, blocks: PageBlock[]): AuditLL
     estimatedUplift:
       typeof data.estimatedUplift === "string" && data.estimatedUplift.trim()
         ? data.estimatedUplift.trim()
-        : "+10%",
+        : "+10% à +18%",
     summary:
       typeof data.summary === "string" && data.summary.trim()
         ? data.summary.trim()
-        : "L'analyse montre plusieurs frictions qui limitent la performance de la page.",
+        : "L'analyse montre plusieurs frictions visibles qui limitent la performance commerciale de la page.",
+    strategicSummary:
+      typeof data.strategicSummary === "string" && data.strategicSummary.trim()
+        ? data.strategicSummary.trim()
+        : "La page n'est pas incohérente, mais elle ne transforme pas assez bien l'attention en décision. Le potentiel existe déjà dans le trafic actuel.",
+    missingRevenue:
+      typeof data.missingRevenue === "string" && data.missingRevenue.trim()
+        ? data.missingRevenue.trim()
+        : "Une partie du trafic acquis ne se transforme pas en opportunité commerciale à cause de plusieurs frictions visibles.",
+    missingRevenueRange: sanitizeMissingRevenueRange(data.missingRevenueRange),
     quickWins: Array.isArray(data.quickWins)
       ? data.quickWins
           .slice(0, 5)
@@ -827,7 +961,7 @@ async function repairAuditJsonWithLLM(raw: string) {
   const completion = await openai.chat.completions.create({
     model,
     temperature: 0,
-    max_tokens: 1000,
+    max_tokens: 1200,
     response_format: { type: "json_object" },
     messages: [
       {
@@ -888,8 +1022,8 @@ async function runAuditWithLLM(params: {
 
   const completion = await openai.chat.completions.create({
     model,
-    temperature: 0.1,
-    max_tokens: 900,
+    temperature: 0.15,
+    max_tokens: 1600,
     response_format: { type: "json_object" },
     messages: [
       {
@@ -972,7 +1106,7 @@ export async function POST(req: Request) {
         url,
         pageTitle: snapshot.pageTitle,
         metaDescription: snapshot.metaDescription,
-        textContent: snapshot.textContent.slice(0, 3800),
+        textContent: snapshot.textContent.slice(0, 5000),
         blocks: snapshot.blocks,
       }),
       LLM_TIMEOUT_MS,
@@ -984,22 +1118,37 @@ export async function POST(req: Request) {
 
     const annotations = buildAnnotations(audit.findings, snapshot.blocks)
 
-    const result = {
+    const result: AuditReportResult = {
       success: true,
       message: "Analyse terminée",
       url,
       score: audit.score,
       summary: audit.summary,
+      strategicSummary: audit.strategicSummary,
+      missingRevenue: audit.missingRevenue,
+      missingRevenueRange: audit.missingRevenueRange,
       screenshotUrl: snapshot.screenshotUrl,
       annotations,
       quickWins: audit.quickWins,
       estimatedUplift: audit.estimatedUplift,
       deliveryTime: `${Math.max(1, Math.round((Date.now() - startedAt) / 1000))} secondes`,
       priorities: audit.priorities,
+      findings: audit.findings.map((finding) => ({
+        title: finding.title,
+        category: finding.category,
+        problem: finding.problem,
+        businessImpact: finding.businessImpact,
+        missedOpportunity: finding.missedOpportunity,
+        severity: finding.severity,
+        impactLevel: finding.impactLevel,
+        conversionPotential: finding.conversionPotential,
+        strategicDirection: finding.strategicDirection,
+        whyNow: finding.whyNow,
+      })),
     }
 
     console.log(
-      `[worker] result sizes jobId=${jobId} screenshotChars=${snapshot.screenshotUrl.length} annotations=${annotations.length}`
+      `[worker] result sizes jobId=${jobId} screenshotChars=${snapshot.screenshotUrl.length} annotations=${annotations.length} findings=${audit.findings.length}`
     )
 
     await updateJob(jobId, {

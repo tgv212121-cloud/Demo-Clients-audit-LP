@@ -21,6 +21,35 @@ type Priorities = {
   cta?: number
 }
 
+type FindingCategory =
+  | "message"
+  | "structure"
+  | "trust"
+  | "cta"
+  | "ux"
+  | "offer"
+  | "friction"
+
+type Finding = {
+  title: string
+  category: FindingCategory
+  problem: string
+  businessImpact: string
+  missedOpportunity: string
+  severity: "Faible" | "Moyenne" | "Élevée" | "Critique"
+  impactLevel: "Faible" | "Moyen" | "Important" | "Très important"
+  conversionPotential: string
+  strategicDirection: string
+  whyNow: string
+}
+
+type MissingRevenueRange = {
+  low: number
+  high: number
+  currency: string
+  period: string
+}
+
 type AnalyseResult = {
   success?: boolean
   message?: string
@@ -28,12 +57,16 @@ type AnalyseResult = {
   error?: string
   score?: number
   summary?: string
+  strategicSummary?: string
   screenshotUrl?: string
   annotations?: Annotation[]
   quickWins?: string[]
   estimatedUplift?: string
   deliveryTime?: string
   priorities?: Priorities
+  missingRevenue?: string
+  missingRevenueRange?: MissingRevenueRange
+  findings?: Finding[]
 }
 
 type JobStatus = "queued" | "processing" | "done" | "error"
@@ -55,59 +88,59 @@ type DisplayAnnotation = Annotation & {
 const loadingSteps = [
   {
     title: "Analyse démarrée",
-    text: "Nous préparons l'audit de ta landing page.",
+    text: "Nous préparons la lecture stratégique de ta landing page.",
   },
   {
     title: "Lecture de la page",
-    text: "Nous examinons la structure, le message et les leviers de conversion.",
+    text: "Nous examinons le message, la hiérarchie, la confiance et le passage à l'action.",
   },
   {
     title: "Capture complète",
-    text: "Nous générons une vue nette pour repérer les zones qui freinent l'action.",
+    text: "Nous générons une vue exploitable pour repérer les zones qui affaiblissent la conversion.",
   },
   {
-    title: "Détection des frictions",
-    text: "Nous identifions ce qui réduit la clarté, la confiance et le passage à l'action.",
+    title: "Pré-audit commercial",
+    text: "Nous transformons les frictions visibles en lecture business claire et priorisée.",
   },
   {
     title: "Finalisation du rapport",
-    text: "Nous préparons l'affichage final avec les priorités de correction.",
-  },
-]
-
-const demoProblems = [
-  {
-    label: "Promesse trop floue",
-    text: "Le visiteur ne comprend pas assez vite pourquoi ton offre mérite son attention.",
-  },
-  {
-    label: "CTA trop faible",
-    text: "L'action à faire n'occupe pas assez l'espace visuel et mental.",
-  },
-  {
-    label: "Réassurance insuffisante",
-    text: "La page ne donne pas assez de raisons de croire, donc elle ralentit la décision.",
+    text: "Nous préparons l'affichage final avec le potentiel, le manque à gagner et les priorités.",
   },
 ]
 
 const socialProof = [
   {
     quote:
-      "On a gardé le même trafic. Le nombre de leads a bondi après la refonte.",
+      "On gardait le même trafic depuis des mois. La page a été retravaillée et les leads ont enfin suivi.",
     author: "Thomas, agence B2B",
     result: "+87% de leads",
   },
   {
     quote:
-      "Avant, notre page était propre. Après optimisation, elle a enfin commencé à vendre.",
+      "Le trafic n'était pas le vrai problème. C'était la page. Après refonte, le taux de conversion a changé d'échelle.",
     author: "Julie, infopreneure",
     result: "x2 sur les conversions",
   },
   {
     quote:
-      "Le gain ne venait pas d'un détail. Il venait de la structure complète de la page.",
+      "Ce n'est pas un bouton qui a tout changé. C'est la structure complète de la landing page.",
     author: "Amine, e-commerce",
     result: "trafic mieux rentabilisé",
+  },
+]
+
+const demoProblems = [
+  {
+    label: "Promesse sous-exploitée",
+    text: "La page parle, mais elle n'impose pas assez vite pourquoi l'offre mérite l'attention.",
+  },
+  {
+    label: "Structure qui ralentit",
+    text: "Le visiteur avance dans la page sans sentir de montée claire vers la décision.",
+  },
+  {
+    label: "Confiance trop faible",
+    text: "La page demande de croire avant d'avoir assez rassuré.",
   },
 ]
 
@@ -331,6 +364,29 @@ function getAnnotationCardPosition(annotation: DisplayAnnotation) {
   }
 }
 
+function formatMoneyRange(range?: MissingRevenueRange) {
+  if (!range) {
+    return null
+  }
+
+  const formatter = new Intl.NumberFormat("fr-FR")
+  return `${formatter.format(range.low)} à ${formatter.format(range.high)} ${range.currency} / ${range.period}`
+}
+
+function getPriorityTone(priorities?: Priorities) {
+  if (!priorities) {
+    return "La page présente plusieurs frictions visibles sur le message, la confiance et l'action."
+  }
+
+  const values = [
+    { key: "clarity", value: priorities.clarity ?? 0, label: "clarté du message" },
+    { key: "trust", value: priorities.trust ?? 0, label: "confiance" },
+    { key: "cta", value: priorities.cta ?? 0, label: "passage à l'action" },
+  ].sort((a, b) => b.value - a.value)
+
+  return `Le plus gros levier semble être la ${values[0].label}, suivi par ${values[1].label} puis ${values[2].label}.`
+}
+
 export default function Home() {
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
@@ -348,6 +404,7 @@ export default function Home() {
   const loadingStartedAtRef = useRef<number>(0)
 
   const annotations = result?.annotations ?? []
+  const findings = result?.findings ?? []
 
   const displayAnnotations = useMemo(() => {
     return spreadAnnotations(annotations)
@@ -691,6 +748,7 @@ export default function Home() {
 
   const currentLoadingStep = getLoadingStep(progress)
   const shouldShowResult = Boolean(result && !result.error && !loading && isResultVisualReady)
+  const missingRevenueFormatted = formatMoneyRange(result?.missingRevenueRange)
 
   return (
     <>
@@ -736,7 +794,7 @@ export default function Home() {
               </a>
 
               <div className="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-white/60 md:block">
-                Audit CRO premium
+                Pré-audit CRO commercial
               </div>
             </div>
 
@@ -750,23 +808,22 @@ export default function Home() {
                     Audit offert
                   </div>
                   <div className="glass-chip">
-                    Analyse instantanée
+                    Pré-audit stratégique
                   </div>
                   <div className="glass-chip">
-                    Frictions visibles
+                    Pertes visibles
                   </div>
                 </div>
 
                 <div data-reveal className="reveal">
                   <h1 className="hero-title max-w-6xl text-[44px] font-semibold leading-[0.92] tracking-[-0.05em] text-white md:text-[78px] xl:text-[106px]">
-                    Ta landing convertit mal ?
+                    Ta landing page ne convertit pas à son vrai niveau.
                     <br />
-                    Voilà pourquoi.
+                    Voilà où ça bloque.
                   </h1>
 
                   <p className="mt-6 max-w-3xl text-base leading-8 text-white/68 md:text-xl">
-                    Colle ton URL. En quelques secondes, tu vois ce qui freine la conversion,
-                    gaspille ton trafic et bloque la prise de décision.
+                    Colle ton URL. En quelques secondes, tu vois les frictions visibles, le potentiel de gain et le manque à gagner que ta page laisse passer.
                   </p>
                 </div>
 
@@ -801,13 +858,13 @@ export default function Home() {
 
                   <div className="relative mt-4 grid gap-3 md:grid-cols-3">
                     <div className="feature-chip">
-                      Révèle les pertes invisibles
+                      Montre les freins visibles
                     </div>
                     <div className="feature-chip">
-                      Montre les points qui bloquent l'action
+                      Chiffre le potentiel perdu
                     </div>
                     <div className="feature-chip">
-                      Donne une direction claire
+                      Donne une direction stratégique
                     </div>
                   </div>
 
@@ -835,7 +892,7 @@ export default function Home() {
                         <span className="h-3 w-3 rounded-full bg-[#7db487]" />
                       </div>
                       <span className="text-xs font-medium text-black/45">
-                        Aperçu du diagnostic
+                        Aperçu du pré-audit
                       </span>
                     </div>
 
@@ -844,26 +901,26 @@ export default function Home() {
                         En une analyse
                       </p>
                       <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                        Tu vois ce qui te coûte des clics, des leads et des ventes.
+                        Tu vois ce qui affaiblit la conversion avant que ça te coûte plus de trafic et plus d'argent.
                       </h2>
 
                       <div className="mt-6 grid gap-3">
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                          <p className="text-sm font-semibold">URL</p>
+                          <p className="text-sm font-semibold">Frictions visibles</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Tu colles ta page.
+                            Message, structure, confiance, action.
                           </p>
                         </div>
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                          <p className="text-sm font-semibold">Diagnostic</p>
+                          <p className="text-sm font-semibold">Potentiel chiffré</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Tu récupères les frictions et les priorités.
+                            Tu vois le gain plausible sur la page actuelle.
                           </p>
                         </div>
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
                           <p className="text-sm font-semibold">Suite logique</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Tu comprends quoi corriger en premier.
+                            Tu comprends pourquoi une vraie refonte change les résultats.
                           </p>
                         </div>
                       </div>
@@ -888,10 +945,10 @@ export default function Home() {
                       Comment ça marche
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                      Un mini outil pour révéler les blocages avant qu'ils ne te coûtent plus cher.
+                      Un pré-audit pour révéler les pertes avant qu'elles ne continuent à manger ton trafic.
                     </h2>
                     <p className="mt-4 text-sm leading-7 text-black/68">
-                      Tu entres ton URL. L'outil analyse la hiérarchie, le message, la clarté, la réassurance et l'action attendue.
+                      Tu entres ton URL. L'outil lit la page comme un consultant CRO et transforme les signaux visibles en lecture business claire.
                     </p>
                   </div>
 
@@ -906,7 +963,7 @@ export default function Home() {
                       <p className="text-lg font-semibold">Tu colles ton URL</p>
                     </div>
                     <p className="mt-4 text-sm leading-7 text-black/66">
-                      Quelques secondes suffisent pour lancer l'analyse.
+                      Quelques secondes suffisent pour lancer la lecture de ta landing page.
                     </p>
                   </div>
 
@@ -918,10 +975,10 @@ export default function Home() {
                       <div className="step-badge flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
                         2
                       </div>
-                      <p className="text-lg font-semibold">Tu reçois un diagnostic</p>
+                      <p className="text-lg font-semibold">Tu vois le manque</p>
                     </div>
                     <p className="mt-4 text-sm leading-7 text-black/66">
-                      Frictions détectées, conséquences business et axes de correction.
+                      Frictions visibles, impact business, potentiel, manque à gagner et angle de correction.
                     </p>
                   </div>
                 </div>
@@ -934,35 +991,28 @@ export default function Home() {
                     className="reveal section-card rounded-[36px] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] md:p-8"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                      Ce qui se passe sur la plupart des pages
+                      Ce qui se passe sur beaucoup de pages
                     </p>
                     <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-4xl">
                       Le problème n'est pas toujours le trafic.
-                      Le problème, c'est ce que ta page en fait.
+                      Le problème, c'est ce que la page en fait.
                     </h2>
                     <p className="mt-5 max-w-4xl text-base leading-8 text-black/68 md:text-lg">
-                      Beaucoup de pages ont l'air correctes. Pourtant elles perdent des ventes sur des points simples à repérer et coûteux à ignorer.
+                      Beaucoup de landing pages paraissent correctes. Pourtant elles laissent filer des conversions sur des points visibles, répétés et coûteux à ignorer.
                     </p>
 
                     <div className="mt-8 grid gap-4 md:grid-cols-3">
-                      <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-5">
-                        <p className="text-sm font-semibold text-black">Promesse trop vague</p>
-                        <p className="mt-2 text-sm leading-6 text-black/64">
-                          Le visiteur comprend mal l'offre dans les premières secondes.
-                        </p>
-                      </div>
-                      <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-5">
-                        <p className="text-sm font-semibold text-black">CTA trop discret</p>
-                        <p className="mt-2 text-sm leading-6 text-black/64">
-                          L'action principale n'occupe pas assez l'attention.
-                        </p>
-                      </div>
-                      <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-5">
-                        <p className="text-sm font-semibold text-black">Réassurance trop faible</p>
-                        <p className="mt-2 text-sm leading-6 text-black/64">
-                          La page donne trop peu de raisons de croire et d'agir.
-                        </p>
-                      </div>
+                      {demoProblems.map((item) => (
+                        <div
+                          key={item.label}
+                          className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-5"
+                        >
+                          <p className="text-sm font-semibold text-black">{item.label}</p>
+                          <p className="mt-2 text-sm leading-6 text-black/64">
+                            {item.text}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -974,110 +1024,31 @@ export default function Home() {
                       Tension utile
                     </p>
                     <h3 className="mt-3 text-3xl font-semibold leading-tight">
-                      90 % des landing pages laissent de l'argent sur la table.
+                      Une page moyenne peut déjà te coûter cher sans jamais paraître ratée.
                     </h3>
                     <p className="mt-5 text-base leading-8 text-white/68">
-                      L'analyse sert à mettre ce manque en face de toi sans te noyer dans le technique.
+                      C'est ce qui rend le problème dangereux. Tu continues à envoyer du trafic sur une page qui n'extrait pas assez de valeur.
                     </p>
 
                     <div className="mt-8 space-y-4">
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Tu dépenses pour attirer du trafic</p>
+                        <p className="text-sm font-semibold">Tu paies pour attirer l'attention</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Mais la page ne transforme pas assez cette attention en action.
+                          Mais la page ne transforme pas assez cette attention en décision.
                         </p>
                       </div>
 
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Tu crois que la page est correcte</p>
+                        <p className="text-sm font-semibold">Tu crois que la page tient debout</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Alors qu'elle freine la décision à plusieurs endroits en même temps.
+                          Alors qu'elle freine en silence à plusieurs endroits.
                         </p>
                       </div>
 
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Tu perds sans le voir</p>
+                        <p className="text-sm font-semibold">Tu repousses la vraie refonte</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Et c'est précisément ce qui coûte le plus cher.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section className="mt-8">
-                <div
-                  data-reveal
-                  className="reveal section-card rounded-[36px] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] md:p-8"
-                >
-                  <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                        Exemple de résultat
-                      </p>
-                      <h2 className="mt-2 text-2xl font-semibold md:text-4xl">
-                        Voilà ce qu'un bon diagnostic fait apparaître tout de suite.
-                      </h2>
-                    </div>
-
-                    <div className="rounded-full border border-black/10 bg-[#faf6f0] px-4 py-2 text-sm text-black/64">
-                      Frictions. Conséquences. Priorités.
-                    </div>
-                  </div>
-
-                  <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-                    <div className="dark-panel rounded-[30px] border border-black/10 bg-[#111111] p-6 text-white">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
-                        Diagnostic
-                      </p>
-
-                      <h3 className="mt-4 text-3xl font-semibold leading-tight">
-                        La page n'est pas cassée.
-                        Elle manque surtout de force aux endroits qui déclenchent l'action.
-                      </h3>
-
-                      <p className="mt-5 text-sm leading-7 text-white/66">
-                        Tu ne cherches pas un joli rapport. Tu cherches les blocages qui font perdre des leads sur le trafic actuel.
-                      </p>
-
-                      <div className="dark-tile mt-6 rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Conséquences concrètes</p>
-                        <div className="mt-3 space-y-2 text-sm leading-6 text-white/62">
-                          <p>Moins de conversions sur le trafic actuel</p>
-                          <p>Campagnes rentables plus difficiles à scaler</p>
-                          <p>Offre moins forte dans l'esprit du visiteur</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {demoProblems.map((item) => (
-                        <div
-                          key={item.label}
-                          className="soft-panel rounded-[28px] border border-black/10 bg-[#faf6f0] p-5"
-                        >
-                          <div className="inline-flex rounded-full bg-black px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
-                            Point bloquant
-                          </div>
-                          <h3 className="mt-4 text-xl font-semibold leading-tight">
-                            {item.label}
-                          </h3>
-                          <p className="mt-3 text-sm leading-7 text-black/66">
-                            {item.text}
-                          </p>
-                        </div>
-                      ))}
-
-                      <div className="soft-panel rounded-[28px] border border-[#d4b173]/40 bg-[#f2e7d6] p-5 md:col-span-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-black/46">
-                          Révélation
-                        </p>
-                        <h3 className="mt-3 text-2xl font-semibold leading-tight text-black">
-                          Ta landing page n'est pas mauvaise. Elle est sous-optimisée.
-                        </h3>
-                        <p className="mt-3 max-w-4xl text-sm leading-7 text-black/68">
-                          Et c'est ce qui rend le problème dangereux. Elle paraît correcte, donc tu repousses la vraie correction alors qu'elle te coûte déjà des résultats.
+                          Et pendant ce temps, le trafic continue à être sous-rentabilisé.
                         </p>
                       </div>
                     </div>
@@ -1101,7 +1072,7 @@ export default function Home() {
                         Capture analysée
                       </p>
                       <h2 className="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-5xl">
-                        Voilà où ta landing page perd des conversions.
+                        Voilà où ta landing page sous-performe.
                       </h2>
                     </div>
 
@@ -1118,6 +1089,69 @@ export default function Home() {
                     </div>
                   </div>
 
+                  <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div
+                      data-reveal
+                      data-reveal-result
+                      className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
+                        Score actuel
+                      </p>
+                      <p className="mt-3 text-4xl font-semibold leading-none text-black">
+                        {result?.score ?? 0}/100
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-black/62">
+                        Niveau perçu de performance commerciale de la page.
+                      </p>
+                    </div>
+
+                    <div
+                      data-reveal
+                      data-reveal-result
+                      className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
+                        Potentiel global
+                      </p>
+                      <p className="mt-3 text-3xl font-semibold leading-none text-black">
+                        {result?.estimatedUplift || "+0%"}
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-black/62">
+                        Gain de conversion plausible si les bons leviers sont retravaillés.
+                      </p>
+                    </div>
+
+                    <div
+                      data-reveal
+                      data-reveal-result
+                      className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
+                        Manque à gagner
+                      </p>
+                      <p className="mt-3 text-2xl font-semibold leading-tight text-black">
+                        {missingRevenueFormatted || result?.missingRevenue || "Non estimé"}
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-black/62">
+                        Lecture prudente de la valeur qui n'est pas captée aujourd'hui.
+                      </p>
+                    </div>
+
+                    <div
+                      data-reveal
+                      data-reveal-result
+                      className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
+                        Priorité dominante
+                      </p>
+                      <p className="mt-3 text-base font-semibold leading-7 text-black">
+                        {getPriorityTone(result?.priorities)}
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="xl:hidden">
                     <div
                       data-reveal
@@ -1131,7 +1165,7 @@ export default function Home() {
                               Priorités
                             </p>
                             <h3 className="mt-2 text-2xl font-semibold leading-tight">
-                              Les points qui freinent le plus ta page.
+                              Les points qui freinent le plus la page.
                             </h3>
                           </div>
 
@@ -1281,7 +1315,7 @@ export default function Home() {
 
                               {isActive && (
                                 <div
-                                  className={`absolute left-1/2 ${cardPosition.verticalClass} ${cardPosition.horizontalClass} z-[130] w-[min(340px,calc(100vw-48px))] rounded-[26px] border border-black/10 bg-white p-5 shadow-[0_34px_80px_rgba(0,0,0,0.22)]`}
+                                  className={`absolute left-1/2 ${cardPosition.verticalClass} ${cardPosition.horizontalClass} z-[130] w-[min(360px,calc(100vw-48px))] rounded-[26px] border border-black/10 bg-white p-5 shadow-[0_34px_80px_rgba(0,0,0,0.22)]`}
                                 >
                                   <div className="flex items-start justify-between gap-3">
                                     <div>
@@ -1300,7 +1334,7 @@ export default function Home() {
 
                                   <div className="mt-4 rounded-2xl bg-[#f2e7d6] px-4 py-3">
                                     <p className="text-[11px] uppercase tracking-[0.08em] text-black/45">
-                                      Gain estimé
+                                      Potentiel estimé
                                     </p>
                                     <p className="mt-1 text-sm font-semibold text-black">
                                       {getAnnotationUplift(annotation)} de conversion
@@ -1326,11 +1360,11 @@ export default function Home() {
                     >
                       <div className="mb-5">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                          Ce que ton audit dit vraiment
+                          Lecture stratégique
                         </p>
                         <h2 className="mt-2 text-2xl font-semibold md:text-3xl">
-                          Le problème n'est pas qu'il n'y a rien.
-                          Le problème, c'est qu'il manque ce qui fait agir.
+                          Le problème n'est pas qu'il manque une page.
+                          Le problème, c'est que cette page ne transforme pas assez.
                         </h2>
                       </div>
 
@@ -1338,22 +1372,33 @@ export default function Home() {
                         {result?.summary}
                       </p>
 
+                      {result?.strategicSummary && (
+                        <div className="mt-6 rounded-[28px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
+                            Résumé stratégique
+                          </p>
+                          <p className="mt-3 text-base leading-8 text-black/72 md:text-lg">
+                            {result.strategicSummary}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="mt-6 grid gap-4 md:grid-cols-3">
                         <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-4">
                           <p className="text-sm font-semibold text-black">
-                            Ton trafic a plus de valeur que ce que la page en extrait
+                            Ton trafic vaut plus que ce que la page en extrait
                           </p>
                           <p className="mt-2 text-sm leading-6 text-black/62">
-                            Une meilleure structure augmente la valeur du trafic déjà payé.
+                            Une page sous-optimisée réduit la valeur de chaque visite déjà acquise.
                           </p>
                         </div>
 
                         <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-4">
                           <p className="text-sm font-semibold text-black">
-                            Chaque friction ralentit la décision
+                            Les frictions agissent ensemble
                           </p>
                           <p className="mt-2 text-sm leading-6 text-black/62">
-                            Le manque de clarté et de hiérarchie baisse le passage à l'action.
+                            Le problème vient rarement d'un seul point. C'est l'accumulation qui ralentit la décision.
                           </p>
                         </div>
 
@@ -1362,12 +1407,93 @@ export default function Home() {
                             Le gain existe déjà
                           </p>
                           <p className="mt-2 text-sm leading-6 text-black/62">
-                            Il est bloqué dans une page qui n'appuie pas assez fort au bon endroit.
+                            Il est bloqué dans une page qui n'appuie pas assez fort aux bons endroits.
                           </p>
                         </div>
                       </div>
                     </div>
                   </section>
+
+                  {!!findings.length && (
+                    <section className="mt-8">
+                      <div
+                        data-reveal
+                        data-reveal-result
+                        className="reveal section-card rounded-[36px] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] md:p-8"
+                      >
+                        <div className="mb-6">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
+                            Points détectés
+                          </p>
+                          <h2 className="mt-2 text-2xl font-semibold md:text-4xl">
+                            Voilà ce que la page laisse passer aujourd'hui.
+                          </h2>
+                        </div>
+
+                        <div className="grid gap-4">
+                          {findings.map((finding, index) => (
+                            <div
+                              key={`${finding.title}-${index}`}
+                              className="soft-panel rounded-[28px] border border-black/10 bg-[#faf6f0] p-5"
+                            >
+                              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                <div className="max-w-4xl">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="inline-flex rounded-full bg-black px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
+                                      {finding.category}
+                                    </span>
+                                    <span className="inline-flex rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-black/62">
+                                      {finding.impactLevel}
+                                    </span>
+                                  </div>
+
+                                  <h3 className="mt-4 text-xl font-semibold leading-tight text-black">
+                                    {finding.title}
+                                  </h3>
+
+                                  <p className="mt-3 text-sm leading-7 text-black/70">
+                                    {finding.problem}
+                                  </p>
+
+                                  <p className="mt-3 text-sm leading-7 text-black/70">
+                                    {finding.businessImpact}
+                                  </p>
+
+                                  <p className="mt-3 text-sm leading-7 text-black/70">
+                                    {finding.missedOpportunity}
+                                  </p>
+
+                                  <div className="mt-4 rounded-[22px] border border-[#d4b173]/30 bg-[#f2e7d6] p-4">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-black/45">
+                                      Direction stratégique
+                                    </p>
+                                    <p className="mt-2 text-sm leading-7 text-black/72">
+                                      {finding.strategicDirection}
+                                    </p>
+                                  </div>
+
+                                  <p className="mt-4 text-sm leading-7 text-black/58">
+                                    Pourquoi ce point compte maintenant : {finding.whyNow}
+                                  </p>
+                                </div>
+
+                                <div className="shrink-0">
+                                  <div className="rounded-[22px] border border-black/10 bg-white px-4 py-4">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-black/42">
+                                      Potentiel
+                                    </p>
+                                    <p className="mt-2 text-lg font-semibold text-black">
+                                      {finding.conversionPotential}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+                  )}
                 </div>
 
                 <div className="hidden xl:block">
@@ -1472,53 +1598,53 @@ export default function Home() {
                   </p>
 
                   <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-4xl xl:text-5xl">
-                    Voir les problèmes, c'est utile.
-                    Les corriger avec méthode, c'est ce qui fait rentrer l'argent.
+                    Voir les pertes, c'est utile.
+                    Repenser la page pour vendre plus, c'est un autre niveau.
                   </h2>
 
                   <p className="mt-5 max-w-3xl text-base leading-8 text-white/72 md:text-lg">
-                    Un outil révèle le manque. Une vraie expertise reconstruit la page pour qu'elle vende plus.
+                    Ce pré-audit montre où la page laisse de la valeur sur la table. Il ne remplace pas le vrai travail de refonte, de hiérarchie et de conversion.
                   </p>
 
                   <div className="mt-8 space-y-4">
                     <p className="text-base leading-8 text-white/78">
-                      Une landing page rentable ne repose pas sur un seul élément. Elle repose sur l'alignement entre promesse, structure, preuve, rythme visuel et CTA.
+                      Une landing page rentable ne repose pas sur un détail isolé. Elle repose sur l'alignement entre promesse, structure, preuve, rythme visuel et passage à l'action.
                     </p>
 
                     <p className="text-base leading-8 text-white/78">
-                      C'est pour ça qu'une correction superficielle ne suffit pas. Il faut une page pensée pour convertir.
+                      C'est pour ça qu'un simple ajustement ponctuel ne suffit pas. Il faut une page pensée pour capter l'attention, construire la confiance et pousser la décision.
                     </p>
 
                     <p className="text-base leading-8 text-white/78">
-                      C'est exactement le rôle de DigitalTimes.
+                      C'est précisément le rôle de DigitalTimes.
                     </p>
                   </div>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-2">
                     <div className="dark-tile rounded-[24px] border border-white/10 bg-white/5 p-5">
                       <p className="text-sm font-semibold text-white">
-                        Ce que DigitalTimes travaille
+                        Ce que DigitalTimes retravaille
                       </p>
 
                       <div className="mt-4 space-y-3 text-sm leading-6 text-white/72">
-                        <p>La promesse</p>
+                        <p>La promesse perçue</p>
                         <p>La hiérarchie visuelle</p>
                         <p>Le copywriting</p>
                         <p>La réassurance</p>
-                        <p>Les CTA</p>
+                        <p>Le rythme de conversion</p>
                       </div>
                     </div>
 
                     <div className="dark-tile rounded-[24px] border border-white/10 bg-white/5 p-5">
                       <p className="text-sm font-semibold text-white">
-                        Ce que tu gagnes
+                        Ce que tu récupères
                       </p>
 
                       <div className="mt-4 space-y-3 text-sm leading-6 text-white/72">
                         <p>Plus de leads à trafic égal</p>
                         <p>Des ventes mieux déclenchées</p>
                         <p>Une offre mieux perçue</p>
-                        <p>Une page pensée pour vendre</p>
+                        <p>Une page conçue pour convertir</p>
                       </div>
                     </div>
                   </div>
@@ -1559,7 +1685,7 @@ export default function Home() {
                       Offre
                     </p>
                     <p className="mt-3 text-sm leading-7 text-white/68">
-                      Audit stratégique ou landing page pensée pour convertir. L'objectif n'est pas d'avoir une page de plus. L'objectif est d'avoir une page qui rapporte plus.
+                      Audit stratégique ou landing page orientée conversion. L'objectif n'est pas d'avoir une page de plus. L'objectif est d'avoir une page qui extrait plus de valeur du trafic actuel.
                     </p>
                   </div>
                 </div>
@@ -1581,7 +1707,7 @@ export default function Home() {
                     Ne laisse plus une page moyenne limiter un bon trafic.
                   </h2>
                   <p className="mt-5 max-w-3xl text-base leading-8 text-black/68 md:text-lg">
-                    Tu sais maintenant où ça bloque. La suite logique, c'est d'avoir une landing page pensée pour convertir plus fort.
+                    Tu sais maintenant où ça bloque. La suite logique, c'est une landing page pensée pour convertir plus fort, pas une correction en surface.
                   </p>
 
                   <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -1600,7 +1726,7 @@ export default function Home() {
                       rel="noreferrer"
                       className="cta-light inline-flex items-center justify-center rounded-2xl border border-black/12 bg-[#f3ede4] px-6 py-4 text-base font-semibold text-black transition"
                     >
-                      Obtenir une landing page qui convertit
+                      Demander une vraie refonte orientée conversion
                     </a>
                   </div>
 
@@ -1611,25 +1737,34 @@ export default function Home() {
 
                 <div className="rounded-[30px] border border-black/10 bg-[#faf6f0] p-6">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/42">
-                    Variantes de CTA
+                    Ce que le rapport met en évidence
                   </p>
 
                   <div className="mt-5 space-y-4">
                     <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
                       <p className="text-sm font-semibold text-black">
-                        Variante 1
+                        Ce qui réduit la conversion
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Réserver mon audit offert
+                        Les frictions visibles qui limitent la valeur du trafic actuel.
                       </p>
                     </div>
 
                     <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
                       <p className="text-sm font-semibold text-black">
-                        Variante 2
+                        Ce que ça coûte déjà
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Faire passer ma landing page au niveau supérieur
+                        Le manque à gagner lié à une page qui sous-performe sans forcément paraître mauvaise.
+                      </p>
+                    </div>
+
+                    <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
+                      <p className="text-sm font-semibold text-black">
+                        Pourquoi une agence change la suite
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-black/66">
+                        Parce qu'il faut retravailler l'ensemble du parcours, pas corriger un seul détail.
                       </p>
                     </div>
                   </div>
@@ -1757,28 +1892,28 @@ export default function Home() {
                       </p>
 
                       <h3 className="mt-3 text-2xl font-semibold leading-tight">
-                        Nous préparons un rapport qui montre ce qui affaiblit ta page et ce qu'il faut corriger en premier.
+                        Nous préparons un pré-audit qui montre ce qui affaiblit la page, ce que ça coûte et pourquoi la suite mérite un vrai travail de conversion.
                       </h3>
 
                       <div className="mt-6 grid gap-3">
                         <div className="animate-float rounded-2xl border border-white/10 bg-white/5 p-4">
-                          <p className="text-sm font-semibold">Promesse trop large</p>
+                          <p className="text-sm font-semibold">Promesse sous-exploitée</p>
                           <p className="mt-1 text-sm text-white/60">
-                            Le bénéfice n'est pas perçu assez vite.
+                            Le bénéfice n'impose pas assez vite sa valeur.
                           </p>
                         </div>
 
                         <div className="animate-float-delayed rounded-2xl border border-white/10 bg-white/5 p-4">
-                          <p className="text-sm font-semibold">CTA pas assez fort</p>
+                          <p className="text-sm font-semibold">Structure qui ralentit</p>
                           <p className="mt-1 text-sm text-white/60">
-                            L'action principale manque de domination visuelle.
+                            La page ne conduit pas assez fort vers la décision.
                           </p>
                         </div>
 
                         <div className="animate-float-slower rounded-2xl border border-white/10 bg-white/5 p-4">
-                          <p className="text-sm font-semibold">Réassurance trop faible</p>
+                          <p className="text-sm font-semibold">Réassurance trop légère</p>
                           <p className="mt-1 text-sm text-white/60">
-                            La page donne trop peu de raisons de croire tout de suite.
+                            La preuve n'appuie pas assez tôt au bon endroit.
                           </p>
                         </div>
                       </div>
@@ -1789,7 +1924,7 @@ export default function Home() {
                         Résultat attendu
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/62">
-                        À la fin, tu obtiens une capture annotée, une lecture claire des pertes et une direction nette pour améliorer la conversion.
+                        À la fin, tu obtiens une capture annotée, une lecture claire des pertes, un potentiel de gain et une vraie tension commerciale pour passer à l'étape suivante.
                       </p>
                     </div>
                   </div>
@@ -2221,9 +2356,9 @@ export default function Home() {
             animation: none !important;
             transition: none !important;
             transform: none !important;
-          } 
+          }
         }
       `}</style>
     </>
   )
-} 
+}
