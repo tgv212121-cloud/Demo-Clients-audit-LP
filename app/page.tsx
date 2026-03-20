@@ -2354,7 +2354,7 @@ export default function Home() {
             transition: none !important;
             transform: none !important;
           }
-        }
+        } 
       `}</style>
     </>
   )
