@@ -1151,12 +1151,14 @@ export async function POST(req: Request) {
       `[worker] result sizes jobId=${jobId} screenshotChars=${snapshot.screenshotUrl.length} annotations=${annotations.length} findings=${audit.findings.length}`
     )
 
-    await updateJob(jobId, {
-      status: "done",
-      result,
-      error: undefined,
-      updatedAt: Date.now(),
-    })
+   await updateJob(jobId, {
+  status: "done",
+  result,
+  error: undefined,
+  updatedAt: Date.now(),
+})
+
+await redis.expire(`job:${jobId}`, 600)
 
     console.log(`[worker] done jobId=${jobId}`)
 
