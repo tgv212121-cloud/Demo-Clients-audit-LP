@@ -461,13 +461,14 @@ export default function Home() {
     return () => observer.disconnect()
   }, [loading, result, screenshotLoaded])
 
-   useEffect(() => {
+  useEffect(() => {
     if (!displayAnnotations.length) {
       setActiveAnnotationId(null)
       return
     }
 
     if (!activeAnnotationId) {
+      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
       return
     }
 
@@ -476,7 +477,7 @@ export default function Home() {
     )
 
     if (!exists) {
-      setActiveAnnotationId(null)
+      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
     }
   }, [displayAnnotations, activeAnnotationId])
 
@@ -1058,14 +1059,56 @@ export default function Home() {
           )}
 
           {shouldShowResult && (
-            <section ref={resultSectionRef} className="mt-6">
-              <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.72fr)_390px]">
-                <div className="min-w-0">
-                  <div
-                    data-reveal
-                    data-reveal-result
-                    className="reveal mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
-                  >
+  <section ref={resultSectionRef} className="mt-6">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.72fr)_390px]">
+      <div className="min-w-0">
+
+        <div
+          data-reveal
+          data-reveal-result
+          className="reveal mb-6 overflow-hidden rounded-[30px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] md:p-6"
+        >
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
+                Version agence
+              </p>
+
+              <h3 className="mt-2 text-2xl font-semibold leading-tight text-black md:text-3xl">
+                Tu aimerais proposer ce mini outil à tes prospects sous la marque de ton agence ?
+              </h3>
+
+              <p className="mt-3 text-sm leading-7 text-black/68 md:text-base">
+                DigitalTimes conçoit ce type de mini outil en marque blanche pour aider les agences à générer plus de leads et convertir plus vite.
+              </p>
+            </div>
+
+            <div className="flex shrink-0">
+              <a
+                href="https://digitaltimes.fr/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-2xl bg-black px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black/90"
+              >
+                Découvrir la version personnalisée pour mon agence
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          data-reveal
+          data-reveal-result
+          className="reveal mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
+        >
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
+              Capture analysée
+            </p>
+            <h2 className="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-5xl">
+              Voilà où ta landing page sous-performe.
+            </h2>
+          </div>
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
                         Capture analysée
