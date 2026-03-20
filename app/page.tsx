@@ -461,14 +461,13 @@ export default function Home() {
     return () => observer.disconnect()
   }, [loading, result, screenshotLoaded])
 
-  useEffect(() => {
+   useEffect(() => {
     if (!displayAnnotations.length) {
       setActiveAnnotationId(null)
       return
     }
 
     if (!activeAnnotationId) {
-      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
       return
     }
 
@@ -477,7 +476,7 @@ export default function Home() {
     )
 
     if (!exists) {
-      setActiveAnnotationId(displayAnnotations[0]?.id ?? null)
+      setActiveAnnotationId(null)
     }
   }, [displayAnnotations, activeAnnotationId])
 
