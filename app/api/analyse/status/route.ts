@@ -1,56 +1,58 @@
-import { randomUUID } from "crypto"
-import { createJob } from "@/app/lib/redis"
-import { enqueueAuditJob } from "@/app/lib/qstash"
+import { getJob } from "@/app/lib/redis"
 
-function isValidHttpUrl(value: string) {
+const STALE_PROCESSING_MS = 90000
+const STALE_QUEUED_MS = 120000
+
+export async function GET(req: Request) {
   try {
-    const parsed = new URL(value)
-    return parsed.protocol === "http:" || parsed.protocol === "https:"
-  } catch {
-    return false
-  }
-}
+    const { searchParams } = new URL(req.url)
+    const jobId = searchParams.get("jobId")
 
-function normalizeUrl(value: string) {
-  const trimmed = value.trim()
-
-  if (!trimmed) {
-    return ""
-  }
-
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimmed
-  }
-
-  return `https://${trimmed}`
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json()
-    const rawUrl = typeof body?.url === "string" ? body.url : ""
-    const normalizedUrl = normalizeUrl(rawUrl)
-
-    if (!normalizedUrl || !isValidHttpUrl(normalizedUrl)) {
-      return Response.json({ error: "URL invalide" }, { status: 400 })
+    if (!jobId) {
+      return Response.json({ error: "jobId manquant" }, { status: 400 })
     }
 
-    const jobId = randomUUID()
+    const job = await getJob(jobId)
 
-    await createJob(jobId, normalizedUrl)
-    await enqueueAuditJob(jobId, normalizedUrl)
+    if (!job) {
+      return Response.json({ error: "Job introuvable" }, { status: 404 })
+    }
+
+    const now = Date.now()
+    const lastUpdate = job.updatedAt ?? job.createdAt ?? now
+    const age = now - lastUpdate
+
+    if (job.status === "processing" && age > STALE_PROCESSING_MS) {
+      return Response.json({
+        success: true,
+        job: {
+          ...job,
+          status: "error",
+          error: "L'analyse a pris trop de temps. Le worker a sans doute été coupé avant la fin.",
+        },
+      })
+    }
+
+    if (job.status === "queued" && age > STALE_QUEUED_MS) {
+      return Response.json({
+        success: true,
+        job: {
+          ...job,
+          status: "error",
+          error: "Le job est resté trop longtemps en file d'attente.",
+        },
+      })
+    }
 
     return Response.json({
       success: true,
-      jobId,
-      status: "queued",
-      message: "Analyse lancée",
+      job,
     })
   } catch (error) {
-    console.error("Erreur création job:", error)
+    console.error("Erreur lecture job:", error)
 
     return Response.json(
-      { error: "Impossible de lancer l'analyse" },
+      { error: "Impossible de récupérer le statut du job" },
       { status: 500 }
     )
   }
