@@ -59,6 +59,7 @@ const WAIT_AFTER_TOP_RESET_MS = 260
 const WAIT_AFTER_NAV_MS = 450
 const WAIT_BEFORE_FIRST_SLICE_MS = 700
 const WAIT_BEFORE_RETRY_FIRST_SLICE_MS = 1100
+const WAIT_AFTER_FORCE_REVEAL_MS = 450
 const JPEG_QUALITY = 72
 const MAX_BLOCKS = 90
 
@@ -380,6 +381,103 @@ async function preparePageForStableScreenshot(page: Page) {
     window.scrollTo(0, 0)
     await wait(140)
   })
+}
+
+async function forceRevealAboveTheFoldContent(page: Page) {
+  await page.evaluate(async () => {
+    function wait(ms: number) {
+      return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    const candidates = Array.from(document.querySelectorAll("*"))
+
+    for (const node of candidates) {
+      if (!(node instanceof HTMLElement)) {
+        continue
+      }
+
+      const rect = node.getBoundingClientRect()
+      const text = (node.innerText || node.textContent || "").trim()
+      const style = window.getComputedStyle(node)
+
+      const isAboveTheFold =
+        rect.bottom >= -40 && rect.top <= window.innerHeight * 1.35
+
+      if (!isAboveTheFold) {
+        continue
+      }
+
+      const hasMeaningfulText = text.length >= 18
+      const isLikelyHeading =
+        /^(H1|H2|H3|H4)$/i.test(node.tagName) ||
+        style.fontSize.replace("px", "") !== "" &&
+          Number.parseFloat(style.fontSize) >= 24
+
+      const isLikelyImportantBlock =
+        hasMeaningfulText || isLikelyHeading || rect.height >= 80
+
+      if (!isLikelyImportantBlock) {
+        continue
+      }
+
+      if (
+        style.opacity === "0" ||
+        style.visibility === "hidden" ||
+        style.display === "none" ||
+        style.filter.includes("blur") ||
+        style.transform !== "none"
+      ) {
+        node.style.setProperty("opacity", "1", "important")
+        node.style.setProperty("visibility", "visible", "important")
+        node.style.setProperty("display", "block", "important")
+        node.style.setProperty("transform", "none", "important")
+        node.style.setProperty("filter", "none", "important")
+        node.style.setProperty("clip-path", "none", "important")
+        node.style.setProperty("mask-image", "none", "important")
+        node.style.setProperty("-webkit-mask-image", "none", "important")
+      }
+    }
+
+    const revealSelectors = [
+      "[data-reveal]",
+      ".reveal",
+      ".is-hidden",
+      ".will-animate",
+      "[class*='reveal']",
+      "[class*='fade']",
+      "[class*='motion']",
+      "[class*='animate']",
+      "[style*='opacity: 0']",
+      "[style*='opacity:0']",
+      "[style*='visibility: hidden']",
+      "[style*='visibility:hidden']",
+      "[style*='transform']",
+    ]
+
+    document.querySelectorAll(revealSelectors.join(",")).forEach((node) => {
+      if (!(node instanceof HTMLElement)) {
+        return
+      }
+
+      const rect = node.getBoundingClientRect()
+      if (rect.bottom < -40 || rect.top > window.innerHeight * 1.35) {
+        return
+      }
+
+      node.style.setProperty("opacity", "1", "important")
+      node.style.setProperty("visibility", "visible", "important")
+      node.style.setProperty("transform", "none", "important")
+      node.style.setProperty("filter", "none", "important")
+      node.style.setProperty("clip-path", "none", "important")
+      node.style.setProperty("mask-image", "none", "important")
+      node.style.setProperty("-webkit-mask-image", "none", "important")
+    })
+
+    window.scrollTo(0, 0)
+    await wait(120)
+  })
+
+  await waitForStableViewport(page, WAIT_AFTER_FORCE_REVEAL_MS)
 }
 
 async function getPageMetrics(page: Page) {
@@ -1027,6 +1125,9 @@ export async function takePageSnapshot(url: string): Promise<PageSnapshot> {
     await preparePageForStableScreenshot(page)
     await waitForNetworkCalm(page)
     await waitForPageAssets(page)
+    await forceRevealAboveTheFoldContent(page)
+    await waitForNetworkCalm(page)
+    await waitForPageAssets(page)
     await forceTopRepaint(page)
     await sleep(WAIT_AFTER_TOP_RESET_MS)
 
@@ -1037,6 +1138,7 @@ export async function takePageSnapshot(url: string): Promise<PageSnapshot> {
       window.scrollTo(0, 0)
     })
 
+    await forceRevealAboveTheFoldContent(page)
     await forceTopRepaint(page)
     await sleep(WAIT_AFTER_TOP_RESET_MS)
 
