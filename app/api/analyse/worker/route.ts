@@ -46,34 +46,38 @@ type Annotation = {
 }
 
 const SYSTEM_PROMPT = `
-Tu es un expert senior en CRO, UX, copywriting de conversion et audit de landing page.
-Tu travailles comme une agence haut de gamme.
+Tu es un expert senior en CRO, UX et copywriting.
+Tu travailles comme une agence qui facture des audits.
+
+Ton audit doit paraître humain, crédible et varié.
 
 Objectif :
-- produire un audit crédible
 - détecter les freins à la conversion
-- cibler uniquement des éléments visibles et réellement présents dans les blocs fournis
-- ne jamais inventer une cible
-- ne jamais choisir une cible vague si une cible plus précise existe
+- couvrir plusieurs dimensions de la page
+- éviter toute répétition de type de problème
 
-Règles absolues :
-- tu réponds uniquement en JSON valide compact sur une seule ligne
-- tu réponds en français
-- tu donnes exactement 5 quickWins
-- tu donnes entre 3 et 5 findings
-- chaque finding doit viser une cible précise si possible
-- si tu n'es pas sûr d'une cible, confidence doit être basse
-- tu privilégies les titres, CTA, formulaires, inputs, sections de preuve, pricing, témoignages, FAQ
-- tu évites de viser un gros conteneur générique si un élément plus précis existe dedans
+Règle critique :
+tu dois impérativement couvrir plusieurs catégories différentes.
 
-Pour chaque finding :
-- targetId doit être un id existant parmi les blocs fournis quand tu as une bonne cible
-- targetText doit reprendre le texte réel ou quasi exact de la cible
-- targetType doit décrire la zone visée
-- confidence doit être un nombre entre 0 et 1
+Tu dois répartir les findings sur ces axes :
+- 1 problème de clarté du message ou de promesse
+- 1 problème de structure, hiérarchie ou ordre des sections
+- 1 problème de confiance, réassurance ou preuve sociale
+- 1 problème de conversion ou friction CTA
+- 1 problème complémentaire possible comme lisibilité, surcharge, design, densité, cohérence visuelle, focus ou compréhension
 
-Tu ne donnes jamais un plan détaillé de correction.
-Tu peux donner un indice stratégique général dans improvementHint.
+Interdictions :
+- pas plus de 1 finding centré principalement sur le CTA, sauf si la page a un vrai problème majeur de CTA
+- pas de répétition du même problème reformulé
+- pas de critique générique
+- pas de doublon entre "CTA faible", "CTA peu visible", "CTA dupliqué", "CTA mal différencié" si cela décrit en fait le même problème
+
+Chaque critique doit être spécifique, concrète et utile comme dans un vrai audit d'agence.
+
+Tu dois te comporter comme un humain qui analyse la page.
+
+Tu réponds uniquement en JSON valide compact sur une seule ligne.
+
 
 Format attendu :
 {
@@ -565,17 +569,105 @@ function buildAnnotations(findings: AuditFinding[], blocks: PageBlock[]): Annota
     })
   }
 
-  const deduped = validated.filter((item, index, array) => {
-    return (
-      array.findIndex((other) => {
-        const sameBlock = other.block.id === item.block.id
-        const sameTitle =
-          normalizeForCompare(other.finding.title) ===
-          normalizeForCompare(item.finding.title)
-        return sameBlock || sameTitle
-      }) === index
-    )
-  })
+  const usedTypes = new Set<string>()
+
+const usedTypes = new Set<string>()
+const usedThemes = new Set<string>()
+
+function getFindingTheme(title: string, text: string) {
+  const value = normalizeForCompare(`${title} ${text}`)
+
+  if (
+    value.includes("cta") ||
+    value.includes("appel a l action") ||
+    value.includes("conversion")
+  ) {
+    return "cta"
+  }
+
+  if (
+    value.includes("promesse") ||
+    value.includes("headline") ||
+    value.includes("message") ||
+    value.includes("offre") ||
+    value.includes("proposition de valeur") ||
+    value.includes("clarte")
+  ) {
+    return "message"
+  }
+
+  if (
+    value.includes("preuve") ||
+    value.includes("sociale") ||
+    value.includes("temoign") ||
+    value.includes("confiance") ||
+    value.includes("reassurance") ||
+    value.includes("credibil")
+  ) {
+    return "trust"
+  }
+
+  if (
+    value.includes("structure") ||
+    value.includes("hierarchie") ||
+    value.includes("section") ||
+    value.includes("ordre") ||
+    value.includes("parcours")
+  ) {
+    return "structure"
+  }
+
+  if (
+    value.includes("lisibilite") ||
+    value.includes("design") ||
+    value.includes("surcharge") ||
+    value.includes("densite") ||
+    value.includes("focus") ||
+    value.includes("visuel")
+  ) {
+    return "ux"
+  }
+
+  return "other"
+}
+
+const deduped = validated.filter((item, index, array) => {
+  const type = item.block.type
+  const theme = getFindingTheme(
+  item.finding.title,
+  `${item.finding.problem} ${item.finding.impact} ${item.finding.improvementHint}`
+)
+
+  const duplicateByBlockOrTitle =
+    array.findIndex((other) => {
+      const sameBlock = other.block.id === item.block.id
+      const sameTitle =
+        normalizeForCompare(other.finding.title) ===
+        normalizeForCompare(item.finding.title)
+
+      return sameBlock || sameTitle
+    }) !== index
+
+  if (duplicateByBlockOrTitle) {
+    return false
+  }
+
+  if (theme !== "other" && usedThemes.has(theme)) {
+    return false
+  }
+
+  if (
+    usedTypes.has(type) &&
+    (type === "cta" || type === "headline" || type === "section")
+  ) {
+    return false
+  }
+
+  usedTypes.add(type)
+  usedThemes.add(theme)
+
+  return true
+})
 
   const selected = deduped
     .sort((a, b) => {
