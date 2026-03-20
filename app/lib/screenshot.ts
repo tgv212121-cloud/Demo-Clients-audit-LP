@@ -389,7 +389,113 @@ async function forceRevealAboveTheFoldContent(page: Page) {
       return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
-    const candidates = Array.from(
+    function hasUsefulText(node: HTMLElement) {
+      const text = (node.innerText || node.textContent || "").replace(/\s+/g, " ").trim()
+      return text.length >= 2
+    }
+
+    function isLikelyUiElement(node: HTMLElement) {
+      const tag = node.tagName.toLowerCase()
+      const role = (node.getAttribute("role") || "").toLowerCase()
+      const className = (node.className || "").toString().toLowerCase()
+      const ariaLabel = (node.getAttribute("aria-label") || "").toLowerCase()
+      const text = (node.innerText || node.textContent || "").replace(/\s+/g, " ").trim().toLowerCase()
+
+      if (tag === "button" || tag === "a") return true
+      if (role === "button") return true
+
+      if (
+        className.includes("hero") ||
+        className.includes("badge") ||
+        className.includes("chip") ||
+        className.includes("cta") ||
+        className.includes("logo") ||
+        className.includes("brand") ||
+        className.includes("trust") ||
+        className.includes("reveal")
+      ) {
+        return true
+      }
+
+      if (
+        ariaLabel.includes("button") ||
+        ariaLabel.includes("cta") ||
+        ariaLabel.includes("logo")
+      ) {
+        return true
+      }
+
+      if (
+        text.includes("automatisation intelligente") ||
+        text.includes("discutons de votre projet") ||
+        text.includes("plus de 50 entrepreneurs nous font confiance")
+      ) {
+        return true
+      }
+
+      return false
+    }
+
+    function revealNode(node: HTMLElement) {
+      node.style.setProperty("opacity", "1", "important")
+      node.style.setProperty("visibility", "visible", "important")
+      node.style.setProperty("transform", "none", "important")
+      node.style.setProperty("filter", "none", "important")
+      node.style.setProperty("clip-path", "none", "important")
+      node.style.setProperty("mask-image", "none", "important")
+      node.style.setProperty("-webkit-mask-image", "none", "important")
+      node.style.setProperty("transition", "none", "important")
+      node.style.setProperty("animation", "none", "important")
+      node.style.setProperty("will-change", "auto", "important")
+    }
+
+    const heroRoots = Array.from(document.querySelectorAll("section, header, main, div")).filter(
+      (node) => {
+        if (!(node instanceof HTMLElement)) {
+          return false
+        }
+
+        const rect = node.getBoundingClientRect()
+        if (rect.top > window.innerHeight * 1.2 || rect.bottom < 0) {
+          return false
+        }
+
+        const text = (node.innerText || node.textContent || "").toLowerCase()
+
+        return (
+          node.querySelector("h1") !== null ||
+          text.includes("automatisation intelligente") ||
+          text.includes("discutons de votre projet") ||
+          text.includes("plus de 50 entrepreneurs nous font confiance")
+        )
+      }
+    ) as HTMLElement[]
+
+    const heroRoot = heroRoots[0] || document.body
+
+    revealNode(heroRoot)
+
+    const descendants = Array.from(heroRoot.querySelectorAll("*"))
+
+    for (const node of descendants) {
+      if (!(node instanceof HTMLElement)) {
+        continue
+      }
+
+      const rect = node.getBoundingClientRect()
+      const isNearHero =
+        rect.bottom >= -80 && rect.top <= window.innerHeight * 1.45
+
+      if (!isNearHero) {
+        continue
+      }
+
+      if (hasUsefulText(node) || isLikelyUiElement(node)) {
+        revealNode(node)
+      }
+    }
+
+    const directTargets = Array.from(
       document.querySelectorAll(
         [
           "h1",
@@ -401,47 +507,37 @@ async function forceRevealAboveTheFoldContent(page: Page) {
           "[role='button']",
           "[data-reveal]",
           ".reveal",
-          "[class*='hero'] h1",
-          "[class*='hero'] h2",
-          "[class*='hero'] p",
-          "header h1",
-          "main h1",
+          "[class*='hero']",
+          "[class*='badge']",
+          "[class*='chip']",
+          "[class*='cta']",
+          "[class*='logo']",
+          "[class*='brand']",
+          "[class*='trust']",
         ].join(",")
       )
     )
 
-    for (const node of candidates) {
+    for (const node of directTargets) {
       if (!(node instanceof HTMLElement)) {
         continue
       }
 
       const rect = node.getBoundingClientRect()
-      const text = (node.innerText || node.textContent || "").trim()
-
-      if (!text) {
-        continue
-      }
-
       const isAboveTheFold =
-        rect.bottom >= -40 && rect.top <= window.innerHeight * 1.4
+        rect.bottom >= -80 && rect.top <= window.innerHeight * 1.45
 
       if (!isAboveTheFold) {
         continue
       }
 
-      node.style.setProperty("opacity", "1", "important")
-      node.style.setProperty("visibility", "visible", "important")
-      node.style.setProperty("transform", "none", "important")
-      node.style.setProperty("filter", "none", "important")
-      node.style.setProperty("clip-path", "none", "important")
-      node.style.setProperty("mask-image", "none", "important")
-      node.style.setProperty("-webkit-mask-image", "none", "important")
-      node.style.setProperty("transition", "none", "important")
-      node.style.setProperty("animation", "none", "important")
+      if (hasUsefulText(node) || isLikelyUiElement(node)) {
+        revealNode(node)
+      }
     }
 
     window.scrollTo(0, 0)
-    await wait(120)
+    await wait(160)
   })
 
   await waitForStableViewport(page, WAIT_AFTER_FORCE_REVEAL_MS)
