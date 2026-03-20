@@ -571,7 +571,7 @@ function buildAnnotations(findings: AuditFinding[], blocks: PageBlock[]): Annota
 
   const usedTypes = new Set<string>()
 
-const usedTypes = new Set<string>()
+
 const usedThemes = new Set<string>()
 
 function getFindingTheme(title: string, text: string) {
