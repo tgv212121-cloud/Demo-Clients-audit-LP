@@ -1,18 +1,10 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import { Manrope, Instrument_Serif } from "next/font/google"
+import { Inter } from "next/font/google"
 
-const manrope = Manrope({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
-})
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
+  weight: ["300", "400", "500", "600", "700"],
 })
 
 export const metadata: Metadata = {
@@ -27,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${manrope.variable} ${instrumentSerif.variable} ${manrope.className}`}>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

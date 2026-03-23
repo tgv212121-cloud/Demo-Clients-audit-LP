@@ -78,60 +78,60 @@ type DisplayAnnotation = Annotation & {
 
 const loadingSteps = [
   {
-    title: "Diagnostic lancé",
-    text: "Nous préparons l'analyse stratégique de votre landing page.",
+    title: "Analyse démarrée",
+    text: "Nous préparons la lecture stratégique de ta landing page.",
   },
   {
-    title: "Lecture experte",
-    text: "Nous analysons le message, la structure, les signaux de confiance et les appels à l'action.",
+    title: "Lecture de la page",
+    text: "Nous examinons le message, la hiérarchie, la confiance et le passage à l'action.",
   },
   {
-    title: "Capture réalisée",
-    text: "Nous générons une vue annotée pour identifier précisément les zones qui limitent la conversion.",
+    title: "Capture complète",
+    text: "Nous générons une vue exploitable pour repérer les zones qui affaiblissent la conversion.",
   },
   {
-    title: "Analyse commerciale",
-    text: "Nous traduisons chaque friction en impact business quantifié et priorisé.",
+    title: "Pré-audit commercial",
+    text: "Nous transformons les frictions visibles en lecture business claire et priorisée.",
   },
   {
-    title: "Rapport en cours de finalisation",
-    text: "Votre diagnostic complet est en cours de préparation.",
+    title: "Finalisation du rapport",
+    text: "Nous préparons l'affichage final avec le potentiel et les priorités.",
   },
 ]
 
 const socialProof = [
   {
     quote:
-      "On maintenait le même trafic depuis des mois. Landing Labs a retravaillé la page et les leads ont enfin suivi.",
+      "On gardait le même trafic depuis des mois. La page a été retravaillée et les leads ont enfin suivi.",
     author: "Thomas, agence B2B",
     result: "+87% de leads",
   },
   {
     quote:
-      "Le trafic n'était pas le problème. C'était la page. Après refonte par Landing Labs, le taux de conversion a changé d'échelle.",
+      "Le trafic n'était pas le vrai problème. C'était la page. Après refonte, le taux de conversion a changé d'échelle.",
     author: "Julie, infopreneure",
-    result: "×2 sur les conversions",
+    result: "x2 sur les conversions",
   },
   {
     quote:
-      "Ce n'est pas un détail qui a tout changé. C'est la refonte complète de la structure et du message par Landing Labs.",
+      "Ce n'est pas un bouton qui a tout changé. C'est la structure complète de la landing page.",
     author: "Amine, e-commerce",
-    result: "Trafic rentabilisé",
+    result: "trafic mieux rentabilisé",
   },
 ]
 
 const demoProblems = [
   {
-    label: "Proposition de valeur diluée",
-    text: "Le message principal ne capte pas assez l'attention pour justifier la lecture de la suite.",
+    label: "Promesse sous-exploitée",
+    text: "La page parle, mais elle n'impose pas assez vite pourquoi l'offre mérite l'attention.",
   },
   {
-    label: "Architecture qui freine la décision",
-    text: "L'information est là, mais le parcours ne construit pas de tension claire vers la conversion.",
+    label: "Structure qui ralentit",
+    text: "Le visiteur avance dans la page sans sentir de montée claire vers la décision.",
   },
   {
-    label: "Réassurance insuffisante",
-    text: "Sans preuve sociale ni signaux de confiance bien positionnés, la décision n'arrive pas.",
+    label: "Confiance trop faible",
+    text: "La page demande de croire avant d'avoir assez rassuré.",
   },
 ]
 
@@ -732,7 +732,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="min-h-screen overflow-x-hidden bg-[#f4f4f4] text-black">
+      <main className="min-h-screen overflow-x-hidden bg-[#f3ede4] text-black">
         <div className="pointer-events-none fixed inset-0 opacity-[0.58]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,0,0,0.05),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(0,0,0,0.06),transparent_28%)]" />
           <div className="grain absolute inset-0" />
@@ -741,12 +741,12 @@ export default function Home() {
             style={{
               transform: `translateY(${scrollY * 0.08}px)`,
               background:
-                "linear-gradient(120deg, rgba(0,12,255,0.05), transparent 28%, rgba(0,12,255,0.04) 62%, transparent 85%)",
+                "linear-gradient(120deg, rgba(212,177,115,0.08), transparent 28%, rgba(46,204,255,0.05) 62%, transparent 85%)",
             }}
           />
         </div>
 
-        <section className="relative overflow-hidden border-b border-black/8 bg-[#1a1c4e] text-white">
+        <section className="relative overflow-hidden border-b border-black/8 bg-[#0f0f10] text-white">
           <div className="hero-grid absolute inset-0 opacity-60" />
           <div className="hero-orb hero-orb-1" />
           <div className="hero-orb hero-orb-2" />
@@ -754,7 +754,7 @@ export default function Home() {
             className="hero-orb hero-orb-3"
             style={{ transform: `translate3d(0, ${scrollY * 0.06}px, 0)` }}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(0,12,255,0.20),transparent_22%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(212,177,115,0.12),transparent_22%)]" />
 
           <div className="relative mx-auto max-w-[1720px] px-4 py-5 md:px-8 xl:px-10">
             <div
@@ -762,20 +762,14 @@ export default function Home() {
               className="reveal flex items-center justify-between gap-4"
             >
               <a
-                href="https://landinglabsagency.com/"
+                href="https://digitaltimes.fr/"
                 target="_blank"
                 rel="noreferrer"
-                className="group inline-flex items-center gap-2 transition duration-300 hover:opacity-80"
+                className="group inline-flex items-center rounded-full border border-white/12 bg-white/8 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-white/88 transition duration-300 hover:-translate-y-0.5 hover:bg-white/12 hover:shadow-[0_10px_30px_rgba(255,255,255,0.08)]"
               >
-                {/* Logo LL — version fond sombre (entièrement blanc) */}
-                <svg width="24" height="20" viewBox="0 0 24 20" fill="white" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="0"  y="0" width="4" height="16"/>
-                  <rect x="0"  y="12" width="9" height="4"/>
-                  <rect x="11" y="0" width="4" height="16"/>
-                  <rect x="11" y="12" width="9" height="4"/>
-                </svg>
-                <span className="text-[13px] font-bold tracking-[0.04em] text-white">
-                  LANDINGLAB
+                <span className="relative">
+                  DigitalTimes
+                  <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-white/70 transition duration-300 group-hover:scale-x-100" />
                 </span>
               </a>
 
@@ -791,25 +785,25 @@ export default function Home() {
                   className="reveal mb-6 flex flex-wrap gap-3"
                 >
                   <div className="glass-chip">
-                    Diagnostic expert
+                    Audit offert
                   </div>
                   <div className="glass-chip">
-                    Analyse gratuite
+                    Pré-audit stratégique
                   </div>
                   <div className="glass-chip">
-                    Revenus manqués
+                    Pertes visibles
                   </div>
                 </div>
 
                 <div data-reveal className="reveal">
                   <h1 className="hero-title max-w-6xl text-[44px] font-semibold leading-[0.92] tracking-[-0.05em] text-white md:text-[78px] xl:text-[106px]">
-                    Votre landing page performe en dessous de son potentiel réel.
+                    Ta landing page ne convertit pas à son vrai niveau.
                     <br />
-                    Voici exactement pourquoi.
+                    Voilà où ça bloque.
                   </h1>
 
                   <p className="mt-6 max-w-3xl text-base leading-8 text-white/68 md:text-xl">
-                    Soumettez votre URL. En quelques secondes, obtenez un diagnostic expert : frictions identifiées, manque à gagner chiffré, axes de refonte priorisés.
+                    Colle ton URL. En quelques secondes, tu vois les frictions visibles, le potentiel de gain et la direction stratégique à suivre.
                   </p>
                 </div>
 
@@ -824,15 +818,15 @@ export default function Home() {
                       placeholder="https://tonsite.com"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
-                      className="field-glow h-14 w-full rounded-2xl border border-white/10 bg-white/95 px-5 text-base text-black outline-none transition placeholder:text-black/35 focus:border-[#000cff]/35 focus:ring-4 focus:ring-[#000cff]/12"
+                      className="field-glow h-14 w-full rounded-2xl border border-white/10 bg-white/95 px-5 text-base text-black outline-none transition placeholder:text-black/35 focus:border-[#2ecbff]/35 focus:ring-4 focus:ring-[#2ecbff]/12"
                     />
 
                     <button
                       onClick={handleAnalyse}
                       disabled={loading}
-                      className="cta-primary inline-flex h-14 min-w-[240px] items-center justify-center rounded-full px-6 text-base font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+                      className="cta-primary inline-flex h-14 min-w-[240px] items-center justify-center rounded-2xl px-6 text-base font-semibold text-black transition disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      {loading ? "Analyse en cours..." : "Obtenir mon diagnostic gratuit"}
+                      {loading ? "Analyse en cours..." : "Analyser ma landing page"}
                     </button>
                   </div>
 
@@ -844,13 +838,13 @@ export default function Home() {
 
                   <div className="relative mt-4 grid gap-3 md:grid-cols-3">
                     <div className="feature-chip">
-                      Détecte les freins à la conversion
+                      Montre les freins visibles
                     </div>
                     <div className="feature-chip">
-                      Quantifie le manque à gagner
+                      Chiffre le potentiel perdu
                     </div>
                     <div className="feature-chip">
-                      Oriente la stratégie de refonte
+                      Donne une direction stratégique
                     </div>
                   </div>
 
@@ -863,14 +857,14 @@ export default function Home() {
               </div>
 
               <div className="relative">
-                <div className="absolute -left-6 top-8 h-24 w-24 rounded-full bg-[#000cff]/18 blur-3xl" />
+                <div className="absolute -left-6 top-8 h-24 w-24 rounded-full bg-[#d4b173]/18 blur-3xl" />
                 <div className="absolute bottom-6 right-0 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
 
                 <div
                   data-reveal
                   className="reveal relative rounded-[34px] border border-white/12 bg-white/[0.06] p-4 shadow-[0_40px_120px_rgba(0,0,0,0.25)] backdrop-blur-xl"
                 >
-                  <div className="shine-card rounded-[28px] border border-white/10 bg-[#f4f4f4] p-4 text-black">
+                  <div className="shine-card rounded-[28px] border border-white/10 bg-[#f3ede4] p-4 text-black">
                     <div className="mb-4 flex items-center justify-between gap-3 rounded-[20px] border border-black/8 bg-white px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-[#ff6b57]" />
@@ -878,35 +872,35 @@ export default function Home() {
                         <span className="h-3 w-3 rounded-full bg-[#7db487]" />
                       </div>
                       <span className="text-xs font-medium text-black/45">
-                        Aperçu de votre diagnostic
+                        Aperçu du pré-audit
                       </span>
                     </div>
 
-                    <div className="rounded-[24px] border border-black/8 bg-[#1a1c4e] p-5 text-white">
+                    <div className="rounded-[24px] border border-black/8 bg-[#111111] p-5 text-white">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
-                        Votre diagnostic en 3 points
+                        En une analyse
                       </p>
                       <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                        Identifiez précisément ce qui bloque vos conversions et ce que cela vous coûte réellement.
+                        Tu vois ce qui affaiblit la conversion avant que ça te coûte plus de trafic et plus d'opportunités.
                       </h2>
 
                       <div className="mt-6 grid gap-3">
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                          <p className="text-sm font-semibold">Points de friction détectés</p>
+                          <p className="text-sm font-semibold">Frictions visibles</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Message, architecture, confiance, appels à l'action.
+                            Message, structure, confiance, action.
                           </p>
                         </div>
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                          <p className="text-sm font-semibold">Potentiel de conversion estimé</p>
+                          <p className="text-sm font-semibold">Potentiel chiffré</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Gain estimé avec une page entièrement optimisée.
+                            Tu vois le gain plausible sur la page actuelle.
                           </p>
                         </div>
                         <div className="tilt-card rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                          <p className="text-sm font-semibold">Recommandation stratégique</p>
+                          <p className="text-sm font-semibold">Suite logique</p>
                           <p className="mt-1 text-sm text-white/62">
-                            Comprenez pourquoi une refonte experte change structurellement les résultats.
+                            Tu comprends pourquoi une vraie refonte change les résultats.
                           </p>
                         </div>
                       </div>
@@ -928,43 +922,43 @@ export default function Home() {
                     className="reveal section-card rounded-[32px] border border-black/10 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.06)]"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/42">
-                      Notre approche
+                      Comment ça marche
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                      Un diagnostic expert pour arrêter de perdre des conversions silencieusement.
+                      Un pré-audit pour révéler les pertes avant qu'elles ne continuent à manger ton trafic.
                     </h2>
                     <p className="mt-4 text-sm leading-7 text-black/68">
-                      Soumettez votre URL. Notre moteur d'analyse lit votre page comme un consultant CRO senior et traduit chaque signal en décision business.
+                      Tu entres ton URL. L'outil lit la page comme un consultant CRO et transforme les signaux visibles en lecture business claire.
                     </p>
                   </div>
 
                   <div
                     data-reveal
-                    className="reveal section-card rounded-[32px] border border-black/10 bg-[#f7f7f7] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.05)]"
+                    className="reveal section-card rounded-[32px] border border-black/10 bg-[#faf6f0] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.05)]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="step-badge flex h-10 w-10 items-center justify-center rounded-full bg-[#000cff] text-sm font-semibold text-white">
+                      <div className="step-badge flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
                         1
                       </div>
-                      <p className="text-lg font-semibold">Soumettez votre URL</p>
+                      <p className="text-lg font-semibold">Tu colles ton URL</p>
                     </div>
                     <p className="mt-4 text-sm leading-7 text-black/66">
-                      En quelques secondes, notre outil capture et analyse l'intégralité de votre page.
+                      Quelques secondes suffisent pour lancer la lecture de ta landing page.
                     </p>
                   </div>
 
                   <div
                     data-reveal
-                    className="reveal section-card rounded-[32px] border border-black/10 bg-[#f7f7f7] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.05)]"
+                    className="reveal section-card rounded-[32px] border border-black/10 bg-[#faf6f0] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.05)]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="step-badge flex h-10 w-10 items-center justify-center rounded-full bg-[#000cff] text-sm font-semibold text-white">
+                      <div className="step-badge flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
                         2
                       </div>
-                      <p className="text-lg font-semibold">Recevez votre diagnostic</p>
+                      <p className="text-lg font-semibold">Tu vois le manque</p>
                     </div>
                     <p className="mt-4 text-sm leading-7 text-black/66">
-                      Frictions critiques, impact business estimé et axes d'amélioration priorisés.
+                      Frictions visibles, impact business, potentiel et angle de correction.
                     </p>
                   </div>
                 </div>
@@ -977,21 +971,21 @@ export default function Home() {
                     className="reveal section-card rounded-[36px] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] md:p-8"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                      La réalité des landing pages
+                      Ce qui se passe sur beaucoup de pages
                     </p>
                     <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-4xl">
-                      Le trafic n'est pas le problème.
-                      La page qui ne convertit pas, si.
+                      Le problème n'est pas toujours le trafic.
+                      Le problème, c'est ce que la page en fait.
                     </h2>
                     <p className="mt-5 max-w-4xl text-base leading-8 text-black/68 md:text-lg">
-                      La majorité des landing pages présentent une architecture correcte en apparence. Pourtant, elles laissent filer des conversions sur des points précis, répétés et coûteux à ignorer.
+                      Beaucoup de landing pages paraissent correctes. Pourtant elles laissent filer des conversions sur des points visibles, répétés et coûteux à ignorer.
                     </p>
 
                     <div className="mt-8 grid gap-4 md:grid-cols-3">
                       {demoProblems.map((item) => (
                         <div
                           key={item.label}
-                          className="soft-panel rounded-[24px] border border-black/8 bg-[#f7f7f7] p-5"
+                          className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-5"
                         >
                           <p className="text-sm font-semibold text-black">{item.label}</p>
                           <p className="mt-2 text-sm leading-6 text-black/64">
@@ -1004,37 +998,37 @@ export default function Home() {
 
                   <div
                     data-reveal
-                    className="reveal dark-panel rounded-[36px] border border-black/10 bg-[#1a1c4e] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.14)] md:p-8"
+                    className="reveal dark-panel rounded-[36px] border border-black/10 bg-[#111111] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.14)] md:p-8"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                      Le vrai coût
+                      Tension utile
                     </p>
                     <h3 className="mt-3 text-3xl font-semibold leading-tight">
-                      Une page qui semble correcte vous coûte des opportunités à chaque visite.
+                      Une page moyenne peut déjà te coûter cher sans jamais paraître ratée.
                     </h3>
                     <p className="mt-5 text-base leading-8 text-white/68">
-                      C'est précisément ce qui rend ce problème critique : vous continuez d'investir en acquisition pendant que la page sous-performe en silence.
+                      C'est ce qui rend le problème dangereux. Tu continues à envoyer du trafic sur une page qui n'extrait pas assez de valeur.
                     </p>
 
                     <div className="mt-8 space-y-4">
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Vous investissez en acquisition</p>
+                        <p className="text-sm font-semibold">Tu paies pour attirer l'attention</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Mais sans une page optimisée, chaque euro de trafic génère moins qu'il ne devrait.
+                          Mais la page ne transforme pas assez cette attention en décision.
                         </p>
                       </div>
 
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">La page semble fonctionner</p>
+                        <p className="text-sm font-semibold">Tu crois que la page tient debout</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Pourtant, des frictions invisibles réduisent vos conversions à chaque visite.
+                          Alors qu'elle freine en silence à plusieurs endroits.
                         </p>
                       </div>
 
                       <div className="dark-tile rounded-[22px] border border-white/10 bg-white/5 p-4">
-                        <p className="text-sm font-semibold">Vous différez la refonte</p>
+                        <p className="text-sm font-semibold">Tu repousses la vraie refonte</p>
                         <p className="mt-2 text-sm leading-6 text-white/62">
-                          Et pendant ce temps, la concurrence capte les conversions que votre page laisse échapper.
+                          Et pendant ce temps, le trafic continue à être sous-rentabilisé.
                         </p>
                       </div>
                     </div>
@@ -1051,31 +1045,31 @@ export default function Home() {
                   <div
                     data-reveal
                     data-reveal-result
-                    className="reveal mb-6 overflow-hidden rounded-[30px] border border-[#000cff]/35 bg-[#eef1ff] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] md:p-6"
+                    className="reveal mb-6 overflow-hidden rounded-[30px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] md:p-6"
                   >
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                       <div className="max-w-3xl">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
-                          Propulsé par Landing Labs
+                          Version agence
                         </p>
 
                         <h3 className="mt-2 text-2xl font-semibold leading-tight text-black md:text-3xl">
-                          Ce diagnostic révèle les failles. Il est temps de les corriger avec une agence spécialisée.
+                          Tu aimerais proposer ce mini outil à tes prospects sous la marque de ton agence ?
                         </h3>
 
                         <p className="mt-3 text-sm leading-7 text-black/68 md:text-base">
-                          Landing Labs est spécialisée dans la conception de landing pages à haute conversion. Transformez ce diagnostic en résultats concrets.
+                          DigitalTimes conçoit ce type de mini outil en marque blanche pour aider les agences à générer plus de leads et convertir plus vite.
                         </p>
                       </div>
 
                       <div className="flex shrink-0">
                         <a
-                          href="https://landinglabsagency.com/"
+                          href="https://digitaltimes.fr/"
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center justify-center rounded-full bg-[#000cff] px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#0009cc]"
+                          className="inline-flex items-center justify-center rounded-2xl bg-black px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black/90"
                         >
-                          Travailler avec Landing Labs
+                          Découvrir la version personnalisée pour mon agence
                         </a>
                       </div>
                     </div>
@@ -1088,10 +1082,10 @@ export default function Home() {
                   >
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                        Analyse détaillée
+                        Capture analysée
                       </p>
                       <h2 className="mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-5xl">
-                        Voici précisément où votre page laisse des conversions sur la table.
+                        Voilà où ta landing page sous-performe.
                       </h2>
                     </div>
 
@@ -1115,13 +1109,13 @@ export default function Home() {
                       className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
                     >
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
-                        Score CRO
+                        Score actuel
                       </p>
                       <p className="mt-3 text-4xl font-semibold leading-none text-black">
                         {result?.score ?? 0}/100
                       </p>
                       <p className="mt-3 text-sm leading-6 text-black/62">
-                        Performance commerciale estimée de votre page.
+                        Niveau perçu de performance commerciale de la page.
                       </p>
                     </div>
 
@@ -1131,13 +1125,13 @@ export default function Home() {
                       className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
                     >
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
-                        Potentiel de gain
+                        Potentiel global
                       </p>
                       <p className="mt-3 text-3xl font-semibold leading-none text-black">
                         {result?.estimatedUplift || "+0%"}
                       </p>
                       <p className="mt-3 text-sm leading-6 text-black/62">
-                        Hausse de conversion estimée avec une page optimisée.
+                        Gain de conversion plausible si les bons leviers sont retravaillés.
                       </p>
                     </div>
 
@@ -1147,7 +1141,7 @@ export default function Home() {
                       className="reveal stat-box rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
                     >
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/42">
-                        Levier prioritaire
+                        Priorité dominante
                       </p>
                       <p className="mt-3 text-base font-semibold leading-7 text-black">
                         {getPriorityTone(result?.priorities)}
@@ -1162,13 +1156,13 @@ export default function Home() {
                       className="reveal mb-6"
                     >
                       <div className="sticky top-4 z-40">
-                        <aside className="dark-panel rounded-[36px] border border-black/10 bg-[#1a1c4e] p-5 text-white shadow-[0_28px_100px_rgba(0,0,0,0.18)]">
+                        <aside className="dark-panel rounded-[36px] border border-black/10 bg-[#111111] p-5 text-white shadow-[0_28px_100px_rgba(0,0,0,0.18)]">
                           <div className="mb-5">
                             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                              Points critiques
+                              Priorités
                             </p>
                             <h3 className="mt-2 text-2xl font-semibold leading-tight">
-                              Les éléments qui limitent le plus vos conversions.
+                              Les points qui freinent le plus la page.
                             </h3>
                           </div>
 
@@ -1247,7 +1241,7 @@ export default function Home() {
                     data-reveal-result
                     className="reveal section-card rounded-[36px] border border-black/10 bg-white p-3 shadow-[0_28px_100px_rgba(0,0,0,0.08)] md:p-4"
                   >
-                    <div className="mb-3 flex items-center justify-between gap-3 rounded-[22px] border border-black/8 bg-[#f7f7f7] px-4 py-3">
+                    <div className="mb-3 flex items-center justify-between gap-3 rounded-[22px] border border-black/8 bg-[#faf6f0] px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-[#ff6b57]" />
                         <span className="h-3 w-3 rounded-full bg-[#d9a14a]" />
@@ -1259,7 +1253,7 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="relative overflow-visible rounded-[30px] border border-black/8 bg-[#eef0ff]">
+                    <div className="relative overflow-visible rounded-[30px] border border-black/8 bg-[#ece1cf]">
                       <div className="overflow-hidden rounded-[30px]">
                         {result?.screenshotUrl ? (
                           <img
@@ -1335,7 +1329,7 @@ export default function Home() {
                                     </span>
                                   </div>
 
-                                  <div className="mt-4 rounded-2xl bg-[#eef1ff] px-4 py-3 border border-[#000cff]/10">
+                                  <div className="mt-4 rounded-2xl bg-[#f2e7d6] px-4 py-3">
                                     <p className="text-[11px] uppercase tracking-[0.08em] text-black/45">
                                       Potentiel estimé
                                     </p>
@@ -1376,7 +1370,7 @@ export default function Home() {
                       </p>
 
                       {result?.strategicSummary && (
-                        <div className="mt-6 rounded-[28px] border border-[#000cff]/35 bg-[#eef1ff] p-5">
+                        <div className="mt-6 rounded-[28px] border border-[#d4b173]/35 bg-[#f2e7d6] p-5">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/45">
                             Résumé stratégique
                           </p>
@@ -1387,7 +1381,7 @@ export default function Home() {
                       )}
 
                       <div className="mt-6 grid gap-4 md:grid-cols-3">
-                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#f7f7f7] p-4">
+                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-4">
                           <p className="text-sm font-semibold text-black">
                             Ton trafic vaut plus que ce que la page en extrait
                           </p>
@@ -1396,7 +1390,7 @@ export default function Home() {
                           </p>
                         </div>
 
-                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#f7f7f7] p-4">
+                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-4">
                           <p className="text-sm font-semibold text-black">
                             Les frictions agissent ensemble
                           </p>
@@ -1405,7 +1399,7 @@ export default function Home() {
                           </p>
                         </div>
 
-                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#f7f7f7] p-4">
+                        <div className="soft-panel rounded-[24px] border border-black/8 bg-[#faf6f0] p-4">
                           <p className="text-sm font-semibold text-black">
                             Le gain existe déjà
                           </p>
@@ -1437,12 +1431,12 @@ export default function Home() {
                           {findings.map((finding, index) => (
                             <div
                               key={`${finding.title}-${index}`}
-                              className="soft-panel rounded-[28px] border border-black/10 bg-[#f7f7f7] p-5"
+                              className="soft-panel rounded-[28px] border border-black/10 bg-[#faf6f0] p-5"
                             >
                               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                 <div className="max-w-4xl">
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className="inline-flex rounded-full bg-[#000cff] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
+                                    <span className="inline-flex rounded-full bg-black px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
                                       {finding.category}
                                     </span>
                                     <span className="inline-flex rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-black/62">
@@ -1466,7 +1460,7 @@ export default function Home() {
                                     {finding.missedOpportunity}
                                   </p>
 
-                                  <div className="mt-4 rounded-[22px] border border-[#000cff]/30 bg-[#eef1ff] p-4">
+                                  <div className="mt-4 rounded-[22px] border border-[#d4b173]/30 bg-[#f2e7d6] p-4">
                                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-black/45">
                                       Direction stratégique
                                     </p>
@@ -1506,7 +1500,7 @@ export default function Home() {
                       data-reveal-result
                       className="reveal is-visible h-full"
                     >
-                      <aside className="dark-panel flex h-full min-h-0 flex-col overflow-hidden rounded-[36px] border border-black/10 bg-[#1a1c4e] p-5 text-white shadow-[0_28px_100px_rgba(0,0,0,0.12)]">
+                      <aside className="dark-panel flex h-full min-h-0 flex-col overflow-hidden rounded-[36px] border border-black/10 bg-[#111111] p-5 text-white shadow-[0_28px_100px_rgba(0,0,0,0.12)]">
                         <div className="mb-5 shrink-0">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
                             Priorités
@@ -1592,62 +1586,62 @@ export default function Home() {
           <section className="mt-8">
             <div
               data-reveal
-              className="reveal overflow-hidden rounded-[40px] border border-black/10 bg-[#1a1c4e] text-white shadow-[0_40px_120px_rgba(0,0,0,0.18)]"
+              className="reveal overflow-hidden rounded-[40px] border border-black/10 bg-[#111111] text-white shadow-[0_40px_120px_rgba(0,0,0,0.18)]"
             >
               <div className="grid gap-0 xl:grid-cols-[1.2fr_0.8fr]">
                 <div className="p-6 md:p-8 xl:p-10">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                    Au-delà du diagnostic
+                    Ce que l'outil ne fait pas à ta place
                   </p>
 
                   <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-4xl xl:text-5xl">
-                    Identifier les failles, c'est le début.
-                    Transformer la page en moteur de conversion, c'est notre métier.
+                    Voir les pertes, c'est utile.
+                    Repenser la page pour vendre plus, c'est un autre niveau.
                   </h2>
 
                   <p className="mt-5 max-w-3xl text-base leading-8 text-white/72 md:text-lg">
-                    Ce diagnostic expose les points de friction. Mais corriger durablement les performances d'une landing page demande bien plus qu'une retouche.
+                    Ce pré-audit montre où la page laisse de la valeur sur la table. Il ne remplace pas le vrai travail de refonte, de hiérarchie et de conversion.
                   </p>
 
                   <div className="mt-8 space-y-4">
                     <p className="text-base leading-8 text-white/78">
-                      Une landing page qui convertit est le résultat d'une architecture pensée, d'un message calibré et d'un parcours qui guide vers la décision — pas d'ajustements épars.
+                      Une landing page rentable ne repose pas sur un détail isolé. Elle repose sur l'alignement entre promesse, structure, preuve, rythme visuel et passage à l'action.
                     </p>
 
                     <p className="text-base leading-8 text-white/78">
-                      C'est pourquoi les corrections isolées déçoivent toujours. La vraie performance vient d'une page entièrement conçue autour de l'objectif de conversion.
+                      C'est pour ça qu'un simple ajustement ponctuel ne suffit pas. Il faut une page pensée pour capter l'attention, construire la confiance et pousser la décision.
                     </p>
 
                     <p className="text-base leading-8 text-white/78">
-                      C'est exactement ce que fait Landing Labs.
+                      C'est précisément le rôle de DigitalTimes.
                     </p>
                   </div>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-2">
                     <div className="dark-tile rounded-[24px] border border-white/10 bg-white/5 p-5">
                       <p className="text-sm font-semibold text-white">
-                        Ce que Landing Labs retravaille
+                        Ce que DigitalTimes retravaille
                       </p>
 
                       <div className="mt-4 space-y-3 text-sm leading-6 text-white/72">
-                        <p>Le positionnement et la promesse</p>
-                        <p>La hiérarchie visuelle et narrative</p>
-                        <p>Le copywriting orienté conversion</p>
-                        <p>Les signaux de confiance</p>
-                        <p>Le rythme et la mécanique de décision</p>
+                        <p>La promesse perçue</p>
+                        <p>La hiérarchie visuelle</p>
+                        <p>Le copywriting</p>
+                        <p>La réassurance</p>
+                        <p>Le rythme de conversion</p>
                       </div>
                     </div>
 
                     <div className="dark-tile rounded-[24px] border border-white/10 bg-white/5 p-5">
                       <p className="text-sm font-semibold text-white">
-                        Ce que vous obtenez
+                        Ce que tu récupères
                       </p>
 
                       <div className="mt-4 space-y-3 text-sm leading-6 text-white/72">
-                        <p>Plus de leads sans augmenter le trafic</p>
-                        <p>Un taux de conversion structurellement plus élevé</p>
-                        <p>Une offre perçue à sa juste valeur</p>
-                        <p>Une page pensée pour déclencher la décision</p>
+                        <p>Plus de leads à trafic égal</p>
+                        <p>Des ventes mieux déclenchées</p>
+                        <p>Une offre mieux perçue</p>
+                        <p>Une page conçue pour convertir</p>
                       </div>
                     </div>
                   </div>
@@ -1655,18 +1649,18 @@ export default function Home() {
 
                 <div className="border-t border-white/10 bg-white/5 p-6 md:p-8 xl:border-l xl:border-t-0 xl:p-10">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                    Résultats clients
+                    Preuves sociales
                   </p>
 
                   <h3 className="mt-3 text-2xl font-semibold leading-tight">
-                    Quand la page est repensée par des experts, les résultats suivent.
+                    Quand la page change, le résultat change.
                   </h3>
 
                   <div className="mt-6 space-y-4">
                     {socialProof.map((item) => (
                       <div
                         key={item.author}
-                        className="dark-tile rounded-[22px] border border-white/10 bg-[#000cff]/15 p-5"
+                        className="dark-tile rounded-[22px] border border-white/10 bg-black/20 p-5"
                       >
                         <p className="text-sm leading-7 text-white/78">
                           “{item.quote}”
@@ -1685,10 +1679,10 @@ export default function Home() {
 
                   <div className="dark-tile mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
                     <p className="text-sm font-semibold text-white">
-                      Notre engagement
+                      Offre
                     </p>
                     <p className="mt-3 text-sm leading-7 text-white/68">
-                      Audit de conversion ou refonte complète. L'objectif est unique : extraire le maximum de valeur de votre trafic avec une page conçue pour convertir.
+                      Audit stratégique ou landing page orientée conversion. L'objectif n'est pas d'avoir une page de plus. L'objectif est d'avoir une page qui extrait plus de valeur du trafic actuel.
                     </p>
                   </div>
                 </div>
@@ -1704,70 +1698,70 @@ export default function Home() {
               <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                    Passez à l'action
+                    Dernière étape
                   </p>
                   <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.03em] md:text-4xl xl:text-5xl">
-                    Ne laissez plus une page sous-optimisée brider votre croissance.
+                    Ne laisse plus une page moyenne limiter un bon trafic.
                   </h2>
                   <p className="mt-5 max-w-3xl text-base leading-8 text-black/68 md:text-lg">
-                    Vous savez maintenant où votre page perd des conversions. L'étape suivante, c'est de confier la refonte à des experts qui conçoivent des pages pensées pour convertir.
+                    Tu sais maintenant où ça bloque. La suite logique, c'est une landing page pensée pour convertir plus fort, pas une correction en surface.
                   </p>
 
                   <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                     <a
-                      href="https://landinglabsagency.com/"
+                      href="https://digitaltimes.fr/"
                       target="_blank"
                       rel="noreferrer"
-                      className="cta-dark inline-flex items-center justify-center rounded-full px-6 py-4 text-base font-semibold text-white transition"
+                      className="cta-dark inline-flex items-center justify-center rounded-2xl px-6 py-4 text-base font-semibold text-white transition"
                     >
-                      Travailler avec Landing Labs
+                      Optimiser ma landing page
                     </a>
 
                     <a
-                      href="https://landinglabsagency.com/"
+                      href="https://digitaltimes.fr/"
                       target="_blank"
                       rel="noreferrer"
-                      className="cta-light inline-flex items-center justify-center rounded-full border border-[#000cff]/20 bg-[#f0f4ff] px-6 py-4 text-base font-semibold text-[#000cff] transition"
+                      className="cta-light inline-flex items-center justify-center rounded-2xl border border-black/12 bg-[#f3ede4] px-6 py-4 text-base font-semibold text-black transition"
                     >
-                      Demander un audit stratégique gratuit
+                      Demander une vraie refonte orientée conversion
                     </a>
                   </div>
 
                   <p className="mt-4 text-sm text-black/52">
-                    Réponse sous 24h. Sans engagement.
+                    Audit offert. Réponse rapide. Sans engagement.
                   </p>
                 </div>
 
-                <div className="rounded-[30px] border border-black/10 bg-[#f7f7f7] p-6">
+                <div className="rounded-[30px] border border-black/10 bg-[#faf6f0] p-6">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/42">
-                    Ce que révèle ce diagnostic
+                    Ce que le rapport met en évidence
                   </p>
 
                   <div className="mt-5 space-y-4">
                     <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
                       <p className="text-sm font-semibold text-black">
-                        Les freins à la conversion
+                        Ce qui réduit la conversion
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Les points précis qui empêchent vos visiteurs de passer à l'action.
+                        Les frictions visibles qui limitent la valeur du trafic actuel.
                       </p>
                     </div>
 
                     <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
                       <p className="text-sm font-semibold text-black">
-                        L'impact sur votre chiffre d'affaires
+                        Ce que ça coûte déjà
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Chaque friction non corrigée représente des leads et des ventes que vous ne récupérez pas.
+                        Le manque se mesure en performance ratée, pas en apparence.
                       </p>
                     </div>
 
                     <div className="soft-panel rounded-[22px] border border-black/8 bg-white p-4">
                       <p className="text-sm font-semibold text-black">
-                        Pourquoi Landing Labs change la donne
+                        Pourquoi une agence change la suite
                       </p>
                       <p className="mt-2 text-sm leading-6 text-black/66">
-                        Parce qu'une refonte experte ne corrige pas un détail — elle repense le parcours entier pour maximiser les conversions.
+                        Parce qu'il faut retravailler l'ensemble du parcours, pas corriger un seul détail.
                       </p>
                     </div>
                   </div>
@@ -1782,19 +1776,19 @@ export default function Home() {
             <div className="absolute inset-0 bg-black/35 backdrop-blur-[14px]" />
 
             <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute left-[8%] top-[10%] h-40 w-40 rounded-full bg-[#000cff]/18 blur-3xl" />
+              <div className="absolute left-[8%] top-[10%] h-40 w-40 rounded-full bg-[#d4b173]/18 blur-3xl" />
               <div className="absolute bottom-[12%] right-[10%] h-52 w-52 rounded-full bg-white/12 blur-3xl" />
-              <div className="absolute left-1/2 top-1/3 h-56 w-56 -translate-x-1/2 rounded-full bg-[#000cff]/8 blur-3xl" />
+              <div className="absolute left-1/2 top-1/3 h-56 w-56 -translate-x-1/2 rounded-full bg-[#efe4d2]/8 blur-3xl" />
             </div>
 
             <div className="relative flex min-h-screen items-center justify-center px-4">
-              <div className="w-full max-w-5xl rounded-[38px] border border-white/12 bg-[#1a1c4e]/88 p-4 text-white shadow-[0_40px_120px_rgba(0,0,0,0.4)] md:p-6 xl:p-7">
+              <div className="w-full max-w-5xl rounded-[38px] border border-white/12 bg-[#111111]/88 p-4 text-white shadow-[0_40px_120px_rgba(0,0,0,0.4)] md:p-6 xl:p-7">
                 <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
                   <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-6">
                     <div className="flex items-center gap-3">
                       <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/12 bg-white/6">
-                        <div className="absolute h-14 w-14 rounded-full border border-[#8899ff]/40 animate-ping" />
-                        <div className="h-7 w-7 rounded-full border-2 border-[#000cff] border-t-transparent animate-spin" />
+                        <div className="absolute h-14 w-14 rounded-full border border-[#efe4d2]/25 animate-ping" />
+                        <div className="h-7 w-7 rounded-full border-2 border-[#efe4d2] border-t-transparent animate-spin" />
                       </div>
 
                       <div>
@@ -1876,7 +1870,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="rounded-[28px] border border-white/10 bg-[#f4f4f4] p-4 text-black md:p-5">
+                  <div className="rounded-[28px] border border-white/10 bg-[#f3ede4] p-4 text-black md:p-5">
                     <div className="mb-4 flex items-center justify-between gap-3 rounded-[20px] border border-black/8 bg-white px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="h-3 w-3 rounded-full bg-[#ff6b57]" />
@@ -1889,7 +1883,7 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="rounded-[24px] border border-black/8 bg-[#1a1c4e] p-5 text-white">
+                    <div className="rounded-[24px] border border-black/8 bg-[#111111] p-5 text-white">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
                         Pendant l'analyse
                       </p>
@@ -1944,7 +1938,7 @@ export default function Home() {
         }
 
         body {
-          background: #f4f4f4;
+          background: #f3ede4;
         }
 
         .grain {
@@ -1976,7 +1970,7 @@ export default function Home() {
           top: 3rem;
           width: 18rem;
           height: 18rem;
-          background: rgba(0, 12, 255, 0.18);
+          background: rgba(46, 203, 255, 0.12);
           animation: orbFloat 12s ease-in-out infinite;
         }
 
@@ -1985,7 +1979,7 @@ export default function Home() {
           top: 12%;
           width: 22rem;
           height: 22rem;
-          background: rgba(51, 85, 255, 0.14);
+          background: rgba(212, 177, 115, 0.14);
           animation: orbFloatReverse 14s ease-in-out infinite;
         }
 
@@ -2085,23 +2079,23 @@ export default function Home() {
         .field-glow {
           box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.35),
-            0 0 0 rgba(0,12,255,0);
+            0 0 0 rgba(46,203,255,0);
         }
 
         .field-glow:focus {
           box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.35),
-            0 0 0 1px rgba(0,12,255,0.16),
-            0 12px 40px rgba(0,12,255,0.08);
+            0 0 0 1px rgba(46,203,255,0.16),
+            0 12px 40px rgba(46,203,255,0.08);
         }
 
         .cta-primary {
           position: relative;
           overflow: hidden;
-          background: linear-gradient(135deg, #3355ff, #000cff 180%);
+          background: linear-gradient(135deg, #efe4d2, #d4b173 180%);
           box-shadow:
-            0 16px 36px rgba(0,12,255,0.22),
-            inset 0 1px 0 rgba(255,255,255,0.20);
+            0 16px 36px rgba(212,177,115,0.18),
+            inset 0 1px 0 rgba(255,255,255,0.55);
         }
 
         .cta-primary::before {
@@ -2126,9 +2120,9 @@ export default function Home() {
         .cta-primary:hover {
           transform: translateY(-2px) scale(1.01);
           box-shadow:
-            0 22px 44px rgba(0,12,255,0.28),
-            0 0 0 8px rgba(0,12,255,0.08),
-            inset 0 1px 0 rgba(255,255,255,0.25);
+            0 22px 44px rgba(212,177,115,0.24),
+            0 0 0 8px rgba(212,177,115,0.08),
+            inset 0 1px 0 rgba(255,255,255,0.6);
         }
 
         .cta-primary:hover::before {
@@ -2205,8 +2199,8 @@ export default function Home() {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(circle at top right, rgba(0,12,255,0.10), transparent 24%),
-            radial-gradient(circle at bottom left, rgba(51,85,255,0.08), transparent 26%);
+            radial-gradient(circle at top right, rgba(46,203,255,0.08), transparent 24%),
+            radial-gradient(circle at bottom left, rgba(212,177,115,0.1), transparent 26%);
           pointer-events: none;
         }
 
@@ -2236,7 +2230,7 @@ export default function Home() {
         .cta-dark {
           position: relative;
           overflow: hidden;
-          background: linear-gradient(135deg, #1a1c4e, #2d3080);
+          background: linear-gradient(135deg, #111111, #232323);
           box-shadow:
             0 18px 44px rgba(0,0,0,0.18),
             inset 0 1px 0 rgba(255,255,255,0.08);
@@ -2277,10 +2271,10 @@ export default function Home() {
         }
 
         .cta-light:hover {
-          background: #eef1ff;
+          background: #efe4d2;
           box-shadow:
             0 20px 44px rgba(0,0,0,0.1),
-            0 0 0 8px rgba(0,12,255,0.06);
+            0 0 0 8px rgba(212,177,115,0.08);
         }
 
         @keyframes floatSoft {
