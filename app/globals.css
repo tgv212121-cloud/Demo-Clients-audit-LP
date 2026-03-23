@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6ead6;
+  --background: #f4f4f4;
   --foreground: #0f0f0f;
-  --accent: #d4b173;
-  --accent-dark: #b8955f;
+  --accent: #000cff;
+  --accent-dark: #0009cc;
 }
 
 * {
@@ -20,8 +20,8 @@ body {
 
 body {
   background:
-    radial-gradient(circle at top, rgba(212, 177, 115, 0.24), transparent 30%),
-    linear-gradient(180deg, #fbf5eb 0%, #f6ead6 100%);
+    radial-gradient(circle at top, rgba(0, 12, 255, 0.06), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
   color: var(--foreground);
 }
 
@@ -31,14 +31,14 @@ img {
 
 .btn-primary {
   background: var(--accent);
-  color: #000000;
+  color: #ffffff;
   padding: 14px 28px;
-  border-radius: 16px;
+  border-radius: 73px;
   font-weight: 600;
   transition: all 0.2s ease;
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(212, 177, 115, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 12, 255, 0.25);
 }
 
 .btn-primary:hover {
@@ -55,28 +55,28 @@ img {
 .input-primary {
   padding: 16px 20px;
   border-radius: 16px;
-  border: 1px solid #e2d6c2;
+  border: 1px solid #e0e0e0;
   width: 100%;
   outline: none;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.92);
   color: #0f0f0f;
   font-size: 16px;
 }
 
 .input-primary:focus {
-  border-color: #d4b173;
-  box-shadow: 0 0 0 4px rgba(212, 177, 115, 0.14);
+  border-color: #000cff;
+  box-shadow: 0 0 0 4px rgba(0, 12, 255, 0.10);
 }
 
 .loading-bar {
-  background: linear-gradient(90deg, #c79d63 0%, #d4b173 50%, #e5c694 100%);
+  background: linear-gradient(90deg, #0009cc 0%, #000cff 50%, #3355ff 100%);
   transition: width 0.2s ease;
-  box-shadow: 0 8px 20px rgba(212, 177, 115, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 12, 255, 0.30);
 }
 
 .premium-card {
   border: 1px solid rgba(15, 15, 15, 0.08);
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(10px);
   border-radius: 28px;
   padding: 24px;
@@ -98,7 +98,7 @@ img {
   height: 42px;
   border: none;
   border-radius: 999px;
-  background: #0f0f0f;
+  background: #1a1c4e;
   color: #ffffff;
   font-size: 14px;
   font-weight: 700;
@@ -112,8 +112,8 @@ img {
 }
 
 .annotation-dot-active {
-  background: #d4b173;
-  color: #000000;
+  background: #000cff;
+  color: #ffffff;
 }
 
 .annotation-chip {
@@ -134,7 +134,7 @@ img {
 }
 
 .annotation-chip-active {
-  background: #0f0f0f;
+  background: #000cff;
   color: #ffffff;
 }
 
@@ -162,8 +162,8 @@ img {
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: #d4b173;
-  color: #000000;
+  background: #000cff;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
 }
@@ -203,9 +203,9 @@ img {
   margin-top: 22px;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
-  background: #d4b173;
-  color: #000000;
+  border-radius: 73px;
+  background: #000cff;
+  color: #ffffff;
   text-decoration: none;
   padding: 14px 20px;
   font-weight: 700;
