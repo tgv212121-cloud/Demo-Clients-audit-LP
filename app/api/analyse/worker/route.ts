@@ -1,6 +1,5 @@
 import OpenAI from "openai"
 import { redis, updateJob } from "@/app/lib/redis"
-import { qstash } from "@/app/lib/qstash"
 import { takePageSnapshot, type PageBlock } from "@/app/lib/screenshot"
 
 type AnnotationSeverity = "low" | "medium" | "high"
@@ -238,15 +237,17 @@ Ta mission :
 - pas d'explication
 `.trim()
 
-const WORKER_LOCK_KEY = "audit:worker:lock"
 const WORKER_LOCK_TTL_SECONDS = 180
-const REQUEUE_DELAY = "2s"
 const SNAPSHOT_TIMEOUT_MS = 60000
 const LLM_TIMEOUT_MS = 60000
 const JSON_REPAIR_TIMEOUT_MS = 15000
 const MAX_SERIALIZED_BLOCKS = 42
 const MIN_VISIBLE_ANNOTATION_CONFIDENCE = 0.78
 const MAX_VISIBLE_ANNOTATIONS = 4
+
+function getWorkerLockKey(jobId: string) {
+  return `audit:worker:lock:${jobId}`
+}
 
 function getOpenAIClient() {
   const apiKey = process.env.OPENAI_API_KEY
@@ -262,25 +263,10 @@ function getModel() {
   return process.env.OPENAI_MODEL || "gpt-4.1-mini"
 }
 
-function getBaseUrl() {
-  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  const publicUrl = process.env.NEXT_PUBLIC_APP_URL
-
-  if (productionUrl) {
-    return `https://${productionUrl}`
-  }
-
-  if (publicUrl) {
-    return publicUrl
-  }
-
-  throw new Error("NEXT_PUBLIC_APP_URL ou VERCEL_PROJECT_PRODUCTION_URL manquant")
-}
-
-async function acquireWorkerLock() {
+async function acquireWorkerLock(jobId: string) {
   const locked = await redis.set(
-    WORKER_LOCK_KEY,
-    { startedAt: Date.now() },
+    getWorkerLockKey(jobId),
+    { startedAt: Date.now(), jobId },
     {
       nx: true,
       ex: WORKER_LOCK_TTL_SECONDS,
@@ -290,19 +276,8 @@ async function acquireWorkerLock() {
   return locked === "OK"
 }
 
-async function releaseWorkerLock() {
-  await redis.del(WORKER_LOCK_KEY)
-}
-
-async function requeueJob(jobId: string, url: string) {
-  await qstash.publishJSON({
-    url: `${getBaseUrl()}/api/analyse/worker`,
-    body: {
-      jobId,
-      url,
-    },
-    delay: REQUEUE_DELAY,
-  })
+async function releaseWorkerLock(jobId: string) {
+  await redis.del(getWorkerLockKey(jobId))
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -368,8 +343,8 @@ function serializeBlocks(blocks: PageBlock[]) {
         `height=${block.height}`,
       ]
 
-      if (block.tagName) parts.push(`tag=${block.tagName}`)
-      if (block.role) parts.push(`role=${block.role}`)
+      if ((block as any).tagName) parts.push(`tag=${shortText((block as any).tagName, 40)}`)
+      if ((block as any).role) parts.push(`role=${shortText((block as any).role, 40)}`)
       if (block.selectorHint) parts.push(`selector=${shortText(block.selectorHint, 80)}`)
       if (block.targetLabel) parts.push(`label=${shortText(block.targetLabel, 120)}`)
       if (block.text) parts.push(`text=${shortText(block.text, 180)}`)
@@ -546,7 +521,7 @@ function findBestBlockByText(blocks: PageBlock[], targetText?: string) {
     const candidates = [
       block.text,
       block.targetLabel || "",
-      block.ariaLabel || "",
+      ((block as any).ariaLabel as string) || "",
       block.selectorHint || "",
     ]
 
@@ -1067,22 +1042,20 @@ export async function POST(req: Request) {
       return Response.json({ error: "jobId ou url manquant" }, { status: 400 })
     }
 
-    lockAcquired = await acquireWorkerLock()
+    lockAcquired = await acquireWorkerLock(jobId)
 
     if (!lockAcquired) {
-      await updateJob(jobId, {
-        status: "queued",
-        updatedAt: Date.now(),
-      })
+      console.log(`[worker] duplicate ignored jobId=${jobId}`)
 
-      await requeueJob(jobId, url)
-
-      return Response.json({
-        success: true,
-        jobId,
-        status: "queued",
-        message: "Job remis dans la file",
-      })
+      return Response.json(
+        {
+          success: true,
+          jobId,
+          status: "processing",
+          message: "Job déjà en cours",
+        },
+        { status: 202 }
+      )
     }
 
     console.log(`[worker] start jobId=${jobId}`)
@@ -1151,14 +1124,14 @@ export async function POST(req: Request) {
       `[worker] result sizes jobId=${jobId} screenshotChars=${snapshot.screenshotUrl.length} annotations=${annotations.length} findings=${audit.findings.length}`
     )
 
-   await updateJob(jobId, {
-  status: "done",
-  result,
-  error: undefined,
-  updatedAt: Date.now(),
-})
+    await updateJob(jobId, {
+      status: "done",
+      result,
+      error: undefined,
+      updatedAt: Date.now(),
+    })
 
-await redis.expire(`job:${jobId}`, 600)
+    await redis.expire(`job:${jobId}`, 600)
 
     console.log(`[worker] done jobId=${jobId}`)
 
@@ -1188,8 +1161,8 @@ await redis.expire(`job:${jobId}`, 600)
 
     return Response.json({ error: "Erreur worker" }, { status: 500 })
   } finally {
-    if (lockAcquired) {
-      await releaseWorkerLock()
+    if (lockAcquired && jobId) {
+      await releaseWorkerLock(jobId)
     }
   }
 }
